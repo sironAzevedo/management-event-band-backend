@@ -54,9 +54,7 @@ module.exports = {
             name, 
             email, 
             confirm_email, 
-            phone, 
-            password, 
-            confirm_password
+            phone
         }, {
             where: {
                 id: user_id
