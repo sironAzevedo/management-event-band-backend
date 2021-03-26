@@ -1,13 +1,14 @@
 package com.geb;
 
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ManagementEventBandBackendApplication {
+public class Application {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ManagementEventBandBackendApplication.class, args);
+		SpringApplication.run(Application.class, args);
 	}
 
 }
