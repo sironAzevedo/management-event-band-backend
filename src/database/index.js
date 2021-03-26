@@ -1,12 +1,15 @@
 const Sequelize= require('sequelize');
 const dbConfig = require('../config/database');
-const Bands = require('../models/Bands');
-
+const Band = require('../models/Band');
 const User = require('../models/User');
 
 const connection = new Sequelize(dbConfig);
 
 User.init(connection);
-Bands.init(connection);
+Band.init(connection);
+
+User.associate(connection.models);
+Band.associate(connection.models)
+
 
 module.exports = connection;

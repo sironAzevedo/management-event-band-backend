@@ -44,11 +44,16 @@ module.exports = {
             name, 
             email, 
             confirm_email, 
-            phone, 
-            password, 
-            confirm_password } = req.body;
+            phone 
+        } = req.body;
 
-        const { user_id } = req.params;
+        const { user_id } = req.params; 
+
+        const user = await User.findByPk(user_id);
+
+        if (!user) {
+            return res.status(400).json({ error: 'User not found' });
+        };
 
         await User.update({
             name, 
@@ -64,12 +69,17 @@ module.exports = {
         return res.status(200).send({
             message: "Usuário atualizado com sucesso!",
         });
-
     },
 
     async delete(req, res) {
 
         const { user_id } = req.params;
+
+        const user = await User.findByPk(user_id);
+
+        if (!user) {
+            return res.status(400).json({ error: 'User not found' });
+        }
 
         await User.destroy({
             where: {

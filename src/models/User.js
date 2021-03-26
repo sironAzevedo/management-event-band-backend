@@ -22,10 +22,9 @@ class User extends Model {
         })
     }
 
-    /* static associate(models) {
-        this.hasMany(models.Address, { foreignKey: 'user_id', as: 'address' });
-        this.belongsToMany(models.Course, { foreignKey: 'user_id', through: 'user_courses', as: 'courses'});
-    } */
+    static associate(models) {
+        this.belongsToMany(models.Band, { foreignKey: 'user_id', through: 'user_bands', as: 'bands' });
+    }
 }
 
 module.exports = User;
