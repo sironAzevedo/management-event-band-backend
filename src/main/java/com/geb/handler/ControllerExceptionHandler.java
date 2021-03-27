@@ -25,10 +25,18 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.NOT_FOUND)
-	@ExceptionHandler(value = { EmptyResultDataAccessException.class, NotFoundException.class, UserException.class })
+	@ExceptionHandler(value = { EmptyResultDataAccessException.class, NotFoundException.class })
 	public StandardError tNotFound(RuntimeException e, HttpServletRequest request) {
 		return StandardError.builder(HttpStatus.NOT_FOUND.value(), e.getMessage(), new Date());
 	}
+	
+	@ResponseBody
+	@ExceptionHandler(UserException.class)
+	public ResponseEntity<StandardError> userExecption(UserException e, HttpServletRequest request) {
+		StandardError error = StandardError.builder(e.getStatus(), e.getMessage(), new Date());
+		return new ResponseEntity<>(error, HttpStatus.valueOf(e.getStatus()));
+	}
+	
 	
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)

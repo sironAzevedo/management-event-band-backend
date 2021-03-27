@@ -1,7 +1,6 @@
 package com.geb.model.dto;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 import javax.validation.constraints.Email;
 
@@ -26,6 +25,4 @@ public class UserDTO implements Serializable {
     private String password;
     private String confirmPassword;
     private TypePersonEnum typeUser;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 }

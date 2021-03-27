@@ -54,22 +54,22 @@ public class User implements UserDetails, Serializable {
 
     @Id
     @Column(name = "ID")
-    @GeneratedValue(generator = "USUARIO_ID_SEQ", strategy = GenerationType.IDENTITY)
-    @SequenceGenerator(name = "USUARIO_ID_SEQ", sequenceName = "USUARIO_ID_SEQ", allocationSize = 1)
+    @GeneratedValue(generator = "USER_ID_SEQ", strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name = "USER_ID_SEQ", sequenceName = "USER_ID_SEQ", allocationSize = 1)
     private Long codigo;
 
     @Column(name = "NAME")
     private String name;
 
     @Email
-    @Column(name = "EMAIL")
+    @Column(name = "EMAIL", unique = true)
     private String email;
 
     @Email
     @Column(name = "CONFIRM_EMAIL")
     private String confirmEmail;
 
-    @Column(name = "PHONE")
+    @Column(name = "PHONE", unique = true)
     private String phone;
 
     @Column(name = "PASSWORD")
