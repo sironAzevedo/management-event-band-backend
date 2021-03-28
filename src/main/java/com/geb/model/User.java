@@ -30,6 +30,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.geb.model.enums.PerfilEnum;
 import com.geb.model.enums.TypePersonEnum;
 
 import lombok.AllArgsConstructor;
@@ -125,4 +126,8 @@ public class User implements UserDetails, Serializable {
     public boolean isEnabled() {
         return true;
     }
+    
+    public boolean hasRole(PerfilEnum perfil) {
+		return getAuthorities().contains(new SimpleGrantedAuthority(perfil.name()));
+	}
 }

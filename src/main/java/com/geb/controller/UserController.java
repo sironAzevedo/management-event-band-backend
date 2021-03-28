@@ -5,8 +5,11 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -26,10 +29,19 @@ public class UserController {
 	
 	@PostMapping
 	@ResponseBody
-	@ResponseStatus(value = HttpStatus.OK)
+	@ResponseStatus(value = HttpStatus.CREATED)
 	public String create(@Valid @RequestBody UserDTO dto) {
 		service.create(dto);
 		String res = "Cadastro realizado com sucesso";
+		return "{\"mensagem\": \"" + res + "\"}";
+	}
+	
+	@PutMapping
+	@ResponseBody
+	@ResponseStatus(value = HttpStatus.OK)
+	public String update(@Valid @RequestBody UserDTO dto) {
+		service.Update(dto);
+		String res = "Cadastro atualizado com sucesso";
 		return "{\"mensagem\": \"" + res + "\"}";
 	}
 	
@@ -38,6 +50,16 @@ public class UserController {
 	@ResponseStatus(value = HttpStatus.OK)
 	public UserDTO findByEmail(@RequestParam(value="email") String email) {
 		return service.findByEmail(email);
+	}
+	
+	@ResponseBody
+	@DeleteMapping
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+	@ResponseStatus(value = HttpStatus.NO_CONTENT)
+	public String delete(@RequestParam(value="code") Long code) {
+		service.delete(code);
+		String res = "User deleted successfully";
+		return "{\"mensagem\": \"" + res + "\"}";
 	}
 
 }

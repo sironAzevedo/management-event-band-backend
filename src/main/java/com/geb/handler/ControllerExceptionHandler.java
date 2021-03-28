@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import com.geb.handler.exception.AuthorizationException;
 import com.geb.handler.exception.EmptyResultDataAccessException;
 import com.geb.handler.exception.InternalErrorException;
 import com.geb.handler.exception.NotFoundException;
@@ -54,6 +55,13 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 		
 		return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
 	}
+	
+	@ResponseBody
+	@ExceptionHandler(AuthorizationException.class)
+	@ResponseStatus(value = HttpStatus.FORBIDDEN)
+	public StandardError authorizationException(AuthorizationException e, HttpServletRequest request) {		
+		return StandardError.builder(HttpStatus.FORBIDDEN.value(), e.getMessage(), new Date());
+	} 
 
 	@Override
 	protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers,

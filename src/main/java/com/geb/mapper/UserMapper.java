@@ -36,6 +36,7 @@ public abstract class UserMapper {
     public UserDTO toDTO(User user) {
     	return UserDTO
                 .builder()
+                .codigo(user.getCodigo())
                 .name(user.getName())
                 .email(user.getEmail())
                 .confirmEmail(user.getConfirmEmail())

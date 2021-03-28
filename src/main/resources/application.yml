@@ -74,5 +74,5 @@ spring:
 #    protocol: smtp
 
 jwt:
-  expiration: ${JWT_EXPIRATION:SequenciaDeCaracteresParaAssinarToken}
-  secret: ${JWT_SECRET:604800000}
+  secret: ${JWT_SECRET:SequenciaDeCaracteresParaAssinarToken}
+  expiration: ${JWT_EXPIRATION:604800000}
