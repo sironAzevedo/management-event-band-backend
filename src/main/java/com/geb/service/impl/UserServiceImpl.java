@@ -42,6 +42,8 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 			throw new UserException("User not found", HttpStatus.NOT_FOUND.value());
 		}
     	
+    	authenticated(user.getEmail());
+    	
     	User entity = mapper.toEntity(user);
     	repo.save(entity);
     }
@@ -58,7 +60,6 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 
     @Override
     public UserDTO findByEmail(String email) {
-    	authenticated(email);
     	return repo.findByEmail(email).map(mapper::toDTO).orElseThrow(()-> new UserException("User not found", HttpStatus.NOT_FOUND.value()));
     }
     

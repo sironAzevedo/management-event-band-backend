@@ -1,0 +1,33 @@
+package com.geb.mapper;
+
+import org.mapstruct.Mapper;
+
+import com.geb.model.Band;
+import com.geb.model.dto.BandDTO;
+
+@Mapper(componentModel = "spring")
+public abstract class BandMapper {
+	
+	public Band toEntity(BandDTO dto) {
+		return Band
+				.builder()
+				.name(dto.getName())
+				.build();
+	}
+	
+	public BandDTO toDTO(Band band) {
+		
+//		List<UserBand> members = band.getMembers();
+		
+		
+		
+		
+		return BandDTO
+				.builder()
+				.codigo(band.getCodigo())
+				.name(band.getName())
+				.build();
+		
+	}
+
+}

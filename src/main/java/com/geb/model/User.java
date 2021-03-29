@@ -3,6 +3,7 @@ package com.geb.model;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -19,6 +20,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
@@ -36,17 +38,13 @@ import com.geb.model.enums.TypePersonEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 @Data
 @Entity
 @Builder
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
 @Table(name = "TB_USER")
 @EntityListeners(AuditingEntityListener.class)
 public class User implements UserDetails, Serializable {
@@ -95,6 +93,9 @@ public class User implements UserDetails, Serializable {
     @JoinTable(name = "TB_USER_ROLE", joinColumns = @JoinColumn(name = "ID_USER", referencedColumnName = "ID"),
             inverseJoinColumns = @JoinColumn(name = "ID_ROLE", referencedColumnName = "ID"))
     private Set<Role> roles;
+    
+    @OneToMany(mappedBy = "user")
+    List<UserBand> bands;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
