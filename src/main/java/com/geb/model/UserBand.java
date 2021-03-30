@@ -1,7 +1,6 @@
 package com.geb.model;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,8 +15,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.geb.model.enums.LeaderEnum;
@@ -55,13 +52,5 @@ public class UserBand implements Serializable {
     @Column(name = "LEADER")
     @Enumerated(EnumType.STRING)
     private LeaderEnum leader;
-    
-    @CreationTimestamp
-    @Column(name = "CREATED_AT", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "UPDATED_AT")
-    private LocalDateTime updatedAt;
 
 }

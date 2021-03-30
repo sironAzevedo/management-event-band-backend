@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 
 import com.geb.model.Band;
 import com.geb.model.dto.BandDTO;
+import com.geb.model.enums.LeaderEnum;
 
 @Mapper(componentModel = "spring")
 public abstract class BandMapper {
@@ -17,17 +18,16 @@ public abstract class BandMapper {
 	
 	public BandDTO toDTO(Band band) {
 		
-//		List<UserBand> members = band.getMembers();
-		
-		
-		
+		String leader = band.getMembers().stream()
+		.filter(l -> LeaderEnum.S.equals(l.getLeader()))
+		.findAny().get().getUser().getName();
 		
 		return BandDTO
 				.builder()
 				.codigo(band.getCodigo())
 				.name(band.getName())
+				.memberLeader(leader)
 				.build();
-		
 	}
 
 }

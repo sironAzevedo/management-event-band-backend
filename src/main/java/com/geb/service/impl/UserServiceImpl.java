@@ -2,17 +2,14 @@ package com.geb.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
-import com.geb.handler.exception.AuthorizationException;
 import com.geb.handler.exception.UserException;
 import com.geb.mapper.UserMapper;
 import com.geb.model.User;
 import com.geb.model.dto.UserDTO;
-import com.geb.model.enums.PerfilEnum;
 import com.geb.repository.IUserPerository;
 import com.geb.service.IUserService;
 
@@ -42,7 +39,7 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 			throw new UserException("User not found", HttpStatus.NOT_FOUND.value());
 		}
     	
-    	authenticated(user.getEmail());
+    	AuthService.authenticated(user.getEmail());
     	
     	User entity = mapper.toEntity(user);
     	repo.save(entity);
@@ -67,19 +64,5 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 	public UserDetails loadUserByUsername(String email) {
 		return repo.findByEmail(email)
     			.orElseThrow(()-> new UserException("User not found", HttpStatus.NOT_FOUND.value()));
-	}
-    
-    private static void authenticated(String email) {
-    	User user = null;
-    	
-    	try {
-    		user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		} catch (Exception e) {
-			throw new UserException(e.getLocalizedMessage());
-		}     	
-    	
-    	if (user == null || !user.hasRole(PerfilEnum.ROLE_ADMIN) && !email.equals(user.getEmail())) {
-			throw new AuthorizationException("Acesso negado");
-		}
-	}    
+	}  
 }

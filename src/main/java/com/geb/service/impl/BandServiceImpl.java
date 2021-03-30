@@ -1,18 +1,23 @@
 package com.geb.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.geb.client.UserClient;
+import com.geb.handler.exception.EmptyResultDataAccessException;
 import com.geb.handler.exception.UserException;
 import com.geb.mapper.BandMapper;
 import com.geb.model.Band;
 import com.geb.model.User;
 import com.geb.model.UserBand;
 import com.geb.model.dto.BandDTO;
+import com.geb.model.dto.MembersDTO;
 import com.geb.model.dto.UserDTO;
 import com.geb.model.enums.LeaderEnum;
 import com.geb.repository.IBandPerository;
@@ -20,6 +25,7 @@ import com.geb.repository.IUserBandRepository;
 import com.geb.service.IBandService;
 
 @Service
+@Transactional
 public class BandServiceImpl implements IBandService {
 	
 	@Autowired
@@ -48,36 +54,86 @@ public class BandServiceImpl implements IBandService {
 		
 		
 		userBandRepository.save(userBand);
-		
-
 	}
 
 	@Override
 	public void Update(BandDTO band) {
-		// TODO Auto-generated method stub
-
+		find(band.getCodigo());
+		repository.save(mapper.toEntity(band));
 	}
 
 	@Override
 	public void delete(Long code) {
-		// TODO Auto-generated method stub
+		find(code);
+		repository.deleteById(code);
 
 	}
 
 	@Override
 	public BandDTO find(Long code) {
-		// TODO Auto-generated method stub
-		return null;
+		return repository.findById(code).map(mapper::toDTO).orElseThrow(()-> new EmptyResultDataAccessException("Band not found"));
 	}
 
 	@Override
 	public void associateMembers(Long codeBand, String emailMember, Boolean leader) {
-		// TODO Auto-generated method stub
+		UserDTO user = this.getUser(emailMember);
+		userBandRepository.findByUserCodigo(user.getCodigo()).ifPresent(r -> {
+			throw new UserException("Este usuario estar associado a estar banda", HttpStatus.BAD_REQUEST.value());
+		});
+		
+		Band band = repository.findById(codeBand).orElseThrow(()-> new EmptyResultDataAccessException("Band not found"));
+		UserBand userBand = UserBand
+				.builder()
+				.user(User.builder().codigo(user.getCodigo()).build())
+				.band(band)
+				.leader(leader? LeaderEnum.S: LeaderEnum.N)
+				.build();
+		userBandRepository.save(userBand);
 
+	} 
+	
+	@Override
+	public void disassociateMembers(Long codeBand, String emailMember) {
+		find(codeBand);
+		UserDTO user = this.getUser(emailMember);
+		userBandRepository.disassociateMembers(codeBand, user.getCodigo());
+	}
+	
+	@Override
+	public List<MembersDTO> findMembers(Long codeBand) {
+		List<MembersDTO> members = new ArrayList<>();
+		Band band = repository.findById(codeBand).orElseThrow(()-> new EmptyResultDataAccessException("Band not found"));
+		
+		List<UserBand> result = band.getMembers();
+		for (UserBand ub : result) {
+			MembersDTO member = MembersDTO
+					.builder()
+					.codigo(ub.getUser().getCodigo())
+					.name(ub.getUser().getName())
+					.email(ub.getUser().getEmail())
+					.leader(ub.getLeader())
+					.build();
+			members.add(member);
+		}
+		return members;
+	}
+	
+	@Override
+	public List<BandDTO> findAssociatedBandsByUser(String email) {
+		UserDTO user = this.getUser(email);
+		AuthService.authenticated(user.getEmail());
+		
+		List<BandDTO> result = new ArrayList<>();
+		List<UserBand> bands = userBandRepository.findAssociatedBandsByUser(user.getCodigo());
+		for (UserBand ub : bands) {
+			BandDTO band = mapper.toDTO(ub.getBand());
+			result.add(band);
+		}
+		
+		return result;
 	}
 	
 	private UserDTO getUser(String user) {
 		return Optional.ofNullable(userClient.findByEmail(user)).orElseThrow(() -> new UserException("User not found", HttpStatus.BAD_REQUEST.value()));
 	}
-
 }
