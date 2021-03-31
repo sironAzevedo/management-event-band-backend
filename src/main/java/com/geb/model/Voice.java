@@ -4,14 +4,13 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
@@ -29,16 +28,16 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "TB_BAND")
+@Table(name = "TB_VOICE")
 @EntityListeners(AuditingEntityListener.class)
-public class Band implements Serializable {
+public class Voice implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
 	@Id
     @Column(name = "ID")
-    @GeneratedValue(generator = "BAND_ID_SEQ", strategy = GenerationType.IDENTITY)
-    @SequenceGenerator(name = "BAND_ID_SEQ", sequenceName = "BAND_ID_SEQ", allocationSize = 1)
+    @GeneratedValue(generator = "VOICE_ID_SEQ", strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name = "VOICE_ID_SEQ", sequenceName = "VOICE_ID_SEQ", allocationSize = 1)
     private Long codigo;
 
     @Column(name = "NAME")
@@ -52,7 +51,6 @@ public class Band implements Serializable {
     @Column(name = "UPDATED_AT")
     private LocalDateTime updatedAt;
     
-    @OneToMany(mappedBy = "band", cascade = CascadeType.ALL)
-    List<BandInfo> members;
-    
+    @ManyToMany(mappedBy = "voices")
+	private List<User> users;    
 }

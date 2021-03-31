@@ -10,17 +10,18 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.geb.model.Band;
-import com.geb.model.UserBand;
+import com.geb.model.BandInfo;
+import com.geb.model.BandInfoPk;
 
 @Repository
-public interface IUserBandRepository extends JpaRepository<UserBand, Long> {
+public interface IBandInfoRepository extends JpaRepository<BandInfo, BandInfoPk> {
 	
-	List<UserBand> findByBand(Band band);
+	List<BandInfo> findByBand(Band band);
 	
-	Optional<UserBand> findByUserCodigo(Long user);
+	Optional<BandInfo> findByUserCodigo(Long user);
 	
 	@Query("select ub from UserBand ub where ub.user.codigo = :user")
-	List<UserBand> findAssociatedBandsByUser(@Param("user") Long user);
+	List<BandInfo> findAssociatedBandsByUser(@Param("user") Long user);
 	
 	@Modifying
 	@Query("delete from UserBand ub where ub.band.codigo = :band and ub.user.codigo = :user")

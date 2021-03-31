@@ -94,8 +94,18 @@ public class User implements UserDetails, Serializable {
             inverseJoinColumns = @JoinColumn(name = "ID_ROLE", referencedColumnName = "ID"))
     private Set<Role> roles;
     
+    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.MERGE })
+    @JoinTable(name = "TB_USER_INSTRUMENT", joinColumns = @JoinColumn(name = "ID_USER", referencedColumnName = "ID"),
+            inverseJoinColumns = @JoinColumn(name = "ID_INSTRUMENT", referencedColumnName = "ID"))
+    private Set<Instrument> instruments;
+    
+    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.MERGE })
+    @JoinTable(name = "TB_USER_VOICE", joinColumns = @JoinColumn(name = "ID_USER", referencedColumnName = "ID"),
+            inverseJoinColumns = @JoinColumn(name = "ID_VOICE", referencedColumnName = "ID"))
+    private Set<Voice> voices;
+    
     @OneToMany(mappedBy = "user")
-    List<UserBand> bands;
+    List<BandInfo> bands;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

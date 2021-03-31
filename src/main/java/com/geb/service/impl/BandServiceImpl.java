@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -15,13 +17,13 @@ import com.geb.handler.exception.UserException;
 import com.geb.mapper.BandMapper;
 import com.geb.model.Band;
 import com.geb.model.User;
-import com.geb.model.UserBand;
+import com.geb.model.BandInfo;
 import com.geb.model.dto.BandDTO;
 import com.geb.model.dto.MembersDTO;
 import com.geb.model.dto.UserDTO;
 import com.geb.model.enums.LeaderEnum;
 import com.geb.repository.IBandPerository;
-import com.geb.repository.IUserBandRepository;
+import com.geb.repository.IBandInfoRepository;
 import com.geb.service.IBandService;
 
 @Service
@@ -32,20 +34,23 @@ public class BandServiceImpl implements IBandService {
 	private IBandPerository repository;
 	
 	@Autowired
-	private IUserBandRepository userBandRepository;
+	private IBandInfoRepository userBandRepository;
 	
 	@Autowired
 	private BandMapper mapper;
 	
 	@Autowired
 	private UserClient userClient;
+	
+	@Autowired
+	private HttpServletRequest request;
 
 	@Override
 	public void create(BandDTO dto) {
 		UserDTO user = this.getUser(dto.getMemberLeader());
 		Band band = repository.save(mapper.toEntity(dto));
 				
-		UserBand userBand = UserBand
+		BandInfo userBand = BandInfo
 				.builder()
 				.user(User.builder().codigo(user.getCodigo()).build())
 				.band(band)
@@ -82,7 +87,7 @@ public class BandServiceImpl implements IBandService {
 		});
 		
 		Band band = repository.findById(codeBand).orElseThrow(()-> new EmptyResultDataAccessException("Band not found"));
-		UserBand userBand = UserBand
+		BandInfo userBand = BandInfo
 				.builder()
 				.user(User.builder().codigo(user.getCodigo()).build())
 				.band(band)
@@ -104,8 +109,8 @@ public class BandServiceImpl implements IBandService {
 		List<MembersDTO> members = new ArrayList<>();
 		Band band = repository.findById(codeBand).orElseThrow(()-> new EmptyResultDataAccessException("Band not found"));
 		
-		List<UserBand> result = band.getMembers();
-		for (UserBand ub : result) {
+		List<BandInfo> result = band.getMembers();
+		for (BandInfo ub : result) {
 			MembersDTO member = MembersDTO
 					.builder()
 					.codigo(ub.getUser().getCodigo())
@@ -124,8 +129,8 @@ public class BandServiceImpl implements IBandService {
 		AuthService.authenticated(user.getEmail());
 		
 		List<BandDTO> result = new ArrayList<>();
-		List<UserBand> bands = userBandRepository.findAssociatedBandsByUser(user.getCodigo());
-		for (UserBand ub : bands) {
+		List<BandInfo> bands = userBandRepository.findAssociatedBandsByUser(user.getCodigo());
+		for (BandInfo ub : bands) {
 			BandDTO band = mapper.toDTO(ub.getBand());
 			result.add(band);
 		}
@@ -134,6 +139,7 @@ public class BandServiceImpl implements IBandService {
 	}
 	
 	private UserDTO getUser(String user) {
-		return Optional.ofNullable(userClient.findByEmail(user)).orElseThrow(() -> new UserException("User not found", HttpStatus.BAD_REQUEST.value()));
+		String token = request.getHeader("Authorization");
+		return Optional.ofNullable(userClient.findByEmail(token, user)).orElseThrow(() -> new UserException("User not found", HttpStatus.BAD_REQUEST.value()));
 	}
 }

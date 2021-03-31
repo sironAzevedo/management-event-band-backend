@@ -1,5 +1,7 @@
 package com.geb.service;
 
+import java.util.List;
+
 import com.geb.model.dto.UserDTO;
 
 public interface IUserService {
@@ -11,4 +13,6 @@ public interface IUserService {
     void delete(Long code);
 
     UserDTO findByEmail(String email);
+    
+    void associateInstrument(Long userCode, List<Long> instruments);
 }

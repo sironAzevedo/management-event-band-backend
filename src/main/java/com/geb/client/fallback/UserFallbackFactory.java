@@ -9,8 +9,7 @@ import com.geb.model.dto.UserDTO;
 public class UserFallbackFactory implements UserClient {
 
 	@Override
-	public UserDTO findByEmail(String email) {
+	public UserDTO findByEmail(String bearerToken, String email) {
 		return null;
 	}
-
 }
