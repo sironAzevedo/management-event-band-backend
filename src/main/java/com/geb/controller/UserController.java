@@ -56,7 +56,7 @@ public class UserController {
 	
 	@ResponseBody
 	@DeleteMapping
-	@PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+//	@PreAuthorize("hasAnyRole('ROLE_ADMIN')")
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 	public String delete(@RequestParam(value="code") Long code) {
 		service.delete(code);
@@ -65,20 +65,20 @@ public class UserController {
 	}
 	
 	@ResponseBody
-	@GetMapping(value = "/associate-instrument")
+	@GetMapping(value = "/instrument")
 	@ResponseStatus(value = HttpStatus.OK)
 	public void associateInstrument(
-			@RequestParam(value="userCode") Long code,
+			@RequestParam(value="user_code") Long code,
 			@RequestParam(value="instruments") List<Long> instruments) {
 		service.associateInstrument(code, instruments);
 	}
 	
 	@ResponseBody
-	@GetMapping(value = "/associate-voice")
+	@GetMapping(value = "/voice")
 	@ResponseStatus(value = HttpStatus.OK)
 	public void associateVoice(
-			@RequestParam(value="userCode") Long code,
-			@RequestParam(value="instruments") List<Long> voices) {
+			@RequestParam(value="user_code") Long code,
+			@RequestParam(value="voices") List<Long> voices) {
 		service.associateVoice(code, voices);
 	}
 

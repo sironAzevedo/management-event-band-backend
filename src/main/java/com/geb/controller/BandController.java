@@ -47,8 +47,7 @@ public class BandController {
 	@ResponseBody
 	@GetMapping(value = "/detail")
 	@ResponseStatus(value = HttpStatus.OK)
-	public BandDTO find(
-			@RequestParam(value="code") Long code) {
+	public BandDTO find(@RequestParam(value="code") Long code) {
 		return service.find(code);
 	}
 	
@@ -58,8 +57,10 @@ public class BandController {
 	public void associateMembers(
 			@RequestParam(value="band_code") Long code,
 			@RequestParam(value="email_member") String email,
-			@RequestParam(value="leader") Boolean leader) {
-		service.associateMembers(code, email, leader);
+			@RequestParam(value="leader", defaultValue = "false") Boolean leader,
+			@RequestParam(value="instrument_code", required = false) Long instrumentCode,
+			@RequestParam(value="voice_code", required = false) Long voiceCode) {
+		service.associateMembers(code, email, leader, instrumentCode, voiceCode);
 	}
 	
 	@ResponseBody

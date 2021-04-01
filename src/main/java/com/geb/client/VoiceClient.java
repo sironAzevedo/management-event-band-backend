@@ -11,7 +11,7 @@ import com.geb.model.dto.VoiceDTO;
 import feign.Headers;
 
 @Component
-@FeignClient(name = "voice", url = "${client.instrument_url}", path = "/v1/voices")
+@FeignClient(name = "voice", url = "${client.voice_url}", path = "/v1/voices")
 public interface VoiceClient {
 
 	final String AUTH_TOKEN = "Authorization";

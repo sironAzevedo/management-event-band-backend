@@ -2,6 +2,7 @@ package com.geb.service.impl;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,14 +14,19 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import com.geb.client.InstrumentClient;
+import com.geb.client.VoiceClient;
 import com.geb.handler.exception.EmptyResultDataAccessException;
 import com.geb.handler.exception.UserException;
 import com.geb.mapper.UserMapper;
 import com.geb.model.Instrument;
+import com.geb.model.Role;
 import com.geb.model.User;
 import com.geb.model.Voice;
 import com.geb.model.dto.InstrumentDTO;
 import com.geb.model.dto.UserDTO;
+import com.geb.model.dto.VoiceDTO;
+import com.geb.model.enums.PerfilEnum;
+import com.geb.repository.IRoleRepository;
 import com.geb.repository.IUserPerository;
 import com.geb.service.IUserService;
 
@@ -31,10 +37,16 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
     private IUserPerository repo;
     
     @Autowired
+    private IRoleRepository roleRepository;
+    
+    @Autowired
     private UserMapper mapper;
     
     @Autowired
-    private InstrumentClient client;
+    private InstrumentClient instrumentClient;
+    
+    @Autowired
+    private VoiceClient voiceClien;
     
     @Autowired
 	private HttpServletRequest request;
@@ -46,7 +58,17 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 			throw new UserException("User exist", HttpStatus.BAD_REQUEST.value());
 		}
     	
+    	Set<Role> roles = new HashSet<>();
+    	if(user.getRoles().isEmpty()) {
+    		roles.add(roleRepository.findByPerfil(PerfilEnum.USER));
+    	} else {
+    		user.getRoles().forEach(role -> {
+    			roles.add(roleRepository.findByPerfil(PerfilEnum.from(role)));
+    		});
+    	}
+    	
     	User entity = mapper.toEntity(user);
+    	entity.setRoles(roles);
     	repo.save(entity);
     }
 
@@ -64,11 +86,11 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 
     @Override
     public void delete(Long code) {
-    	
-    	if (!repo.findById(code).isPresent()) {
-			throw new UserException("User not found", HttpStatus.NOT_FOUND.value());
-		}
-    	
+    	Optional<User> user = repo.findById(code);
+    	if(!user.isPresent()) {
+    		throw new UserException("User not found", HttpStatus.NOT_FOUND.value());
+    	}
+    	AuthService.authenticated(user.get().getEmail());
     	repo.deleteById(code);
     }
 
@@ -91,8 +113,13 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 			String token = request.getHeader("Authorization");
 			instruments.forEach(i -> {
 				try {
-					InstrumentDTO res = client.find(token, i);
-					list.add(Instrument.builder().codigo(res.getCodigo()).build());					
+					InstrumentDTO res = instrumentClient.find(token, i);
+					Instrument instrument = Instrument
+							.builder()
+							.codigo(res.getCodigo())
+							.name(res.getName())
+							.build();
+					list.add(instrument);					
 				} catch (Exception e) {
 					throw new EmptyResultDataAccessException("Instrument not foud");
 				}
@@ -109,10 +136,15 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 			String token = request.getHeader("Authorization");
 			voices.forEach(i -> {
 				try {
-					InstrumentDTO res = client.find(token, i);
-					list.add(Voice.builder().codigo(res.getCodigo()).build());					
+					VoiceDTO res = voiceClien.find(token, i);
+					Voice voice = Voice
+							.builder()
+							.codigo(res.getCodigo())
+							.name(res.getName())
+							.build();
+					list.add(voice);					
 				} catch (Exception e) {
-					throw new EmptyResultDataAccessException("Instrument not foud");
+					throw new EmptyResultDataAccessException("Voice not foud");
 				}
 			});
 			

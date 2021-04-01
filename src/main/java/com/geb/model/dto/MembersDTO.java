@@ -13,9 +13,10 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MembersDTO {
 	
-	private Long codigo;
-    private String name;
+	private String name;
     private String email;
 	private LeaderEnum leader;
+	private String intrumentName;
+	private String voiceName;
 
 }

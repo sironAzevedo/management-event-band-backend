@@ -15,7 +15,7 @@ public interface IBandService {
     
     BandDTO find (Long code);
     
-    void associateMembers(Long codeBand, String emailMember, Boolean leader);
+    void associateMembers(Long codeBand, String emailMember, Boolean leader, Long instrumentCode, Long voiceCode);
     
     void disassociateMembers(Long codeBand, String emailMember);
     

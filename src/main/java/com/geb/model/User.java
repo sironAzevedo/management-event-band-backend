@@ -89,22 +89,22 @@ public class User implements UserDetails, Serializable {
     @Column(name = "UPDATED_AT")
     private LocalDateTime updatedAt;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.MERGE })
+    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.ALL })
     @JoinTable(name = "TB_USER_ROLE", joinColumns = @JoinColumn(name = "ID_USER", referencedColumnName = "ID"),
             inverseJoinColumns = @JoinColumn(name = "ID_ROLE", referencedColumnName = "ID"))
     private Set<Role> roles;
     
-    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.MERGE })
+    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.ALL })
     @JoinTable(name = "TB_USER_INSTRUMENT", joinColumns = @JoinColumn(name = "ID_USER", referencedColumnName = "ID"),
             inverseJoinColumns = @JoinColumn(name = "ID_INSTRUMENT", referencedColumnName = "ID"))
     private Set<Instrument> instruments;
     
-    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.MERGE })
+    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.ALL })
     @JoinTable(name = "TB_USER_VOICE", joinColumns = @JoinColumn(name = "ID_USER", referencedColumnName = "ID"),
             inverseJoinColumns = @JoinColumn(name = "ID_VOICE", referencedColumnName = "ID"))
     private Set<Voice> voices;
     
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "codigo.user", cascade = CascadeType.ALL)
     List<BandInfo> bands;
 
     @Override

@@ -18,9 +18,9 @@ public abstract class BandMapper {
 	
 	public BandDTO toDTO(Band band) {
 		
-		String leader = band.getMembers().stream()
+		String leader = band.getInfo().stream()
 		.filter(l -> LeaderEnum.S.equals(l.getLeader()))
-		.findAny().get().getUser().getName();
+		.findAny().get().getCodigo().getUser().getName();
 		
 		return BandDTO
 				.builder()

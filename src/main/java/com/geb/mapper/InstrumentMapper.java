@@ -19,7 +19,7 @@ public interface InstrumentMapper {
 	Instrument toEntity(InstrumentDTO dto);
 	
 	@Mappings({
-	      @Mapping(target="code", source="entity.code"),
+	      @Mapping(target="codigo", source="entity.codigo"),
 	      @Mapping(target="name", source="entity.name")
 	    })
 	InstrumentDTO toDTO(Instrument entity);

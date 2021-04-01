@@ -8,7 +8,10 @@ import org.springframework.stereotype.Service;
 
 import com.geb.handler.exception.EmptyResultDataAccessException;
 import com.geb.mapper.InstrumentMapper;
+import com.geb.model.Instrument;
+import com.geb.model.InstrumentGroup;
 import com.geb.model.dto.InstrumentDTO;
+import com.geb.repository.IInstrumentGroupRepository;
 import com.geb.repository.IInstrumentRepository;
 import com.geb.service.IInstrumentService;
 
@@ -18,9 +21,15 @@ public class InstrumentServiceImpl implements IInstrumentService {
 	@Autowired
 	private IInstrumentRepository repository;
 	
+	@Autowired
+	private IInstrumentGroupRepository group;
+	
 	@Override
-	public void create(InstrumentDTO dto) {
-		repository.save(InstrumentMapper.INSTANCE.toEntity(dto));
+	public void create(InstrumentDTO dto, Long groupId) {
+		Instrument entity = InstrumentMapper.INSTANCE.toEntity(dto);
+		InstrumentGroup gp = group.findById(groupId).orElseThrow(()-> new EmptyResultDataAccessException("Grup not found"));
+		entity.setGroup(gp);
+		repository.save(entity);
 	}
 
 	@Override

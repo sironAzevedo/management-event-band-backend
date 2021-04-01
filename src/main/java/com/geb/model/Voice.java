@@ -1,7 +1,6 @@
 package com.geb.model;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -14,8 +13,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import lombok.AllArgsConstructor;
@@ -31,7 +28,6 @@ import lombok.NoArgsConstructor;
 @Table(name = "TB_VOICE")
 @EntityListeners(AuditingEntityListener.class)
 public class Voice implements Serializable {
-
 	private static final long serialVersionUID = 1L;
 	
 	@Id
@@ -42,14 +38,6 @@ public class Voice implements Serializable {
 
     @Column(name = "NAME")
     private String name;
-    
-    @CreationTimestamp
-    @Column(name = "CREATED_AT", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "UPDATED_AT")
-    private LocalDateTime updatedAt;
     
     @ManyToMany(mappedBy = "voices")
 	private List<User> users;    

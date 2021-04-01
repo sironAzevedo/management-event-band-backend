@@ -3,9 +3,24 @@ package com.geb.model;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
 import com.geb.model.enums.PerfilEnum;
-import lombok.*;
+import com.geb.model.enums.convert.PerfilConvert;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Entity
@@ -23,9 +38,9 @@ public class Role implements Serializable {
 	private Long codigo;
 
 	@Column(name = "ROLE_DESC")
-	@Enumerated(EnumType.STRING)
+	@Convert(converter = PerfilConvert.class)
 	private PerfilEnum perfil;
 	
-	@ManyToMany(mappedBy = "roles")
+	@ManyToMany(mappedBy = "roles", cascade = CascadeType.ALL)
 	private List<User> usuarios;
 }

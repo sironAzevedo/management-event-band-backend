@@ -6,7 +6,7 @@ import com.geb.model.dto.InstrumentDTO;
 
 public interface IInstrumentService {
 	
-	void create(InstrumentDTO dto);
+	void create(InstrumentDTO dto, Long groupId);
 	
 	void delete(Long code);
 

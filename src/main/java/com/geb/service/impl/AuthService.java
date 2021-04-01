@@ -20,7 +20,7 @@ public final class AuthService {
 	public static void authenticated(String email) {
 		User user = authenticated();
 
-		if (user == null || !user.hasRole(PerfilEnum.ROLE_ADMIN) && !email.equals(user.getEmail())) {
+		if (user == null || !user.hasRole(PerfilEnum.ADMIN) && !email.equals(user.getEmail())) {
 			throw new AuthorizationException("Acesso negado");
 		}
 	}

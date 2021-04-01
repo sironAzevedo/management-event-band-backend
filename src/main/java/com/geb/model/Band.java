@@ -52,7 +52,7 @@ public class Band implements Serializable {
     @Column(name = "UPDATED_AT")
     private LocalDateTime updatedAt;
     
-    @OneToMany(mappedBy = "band", cascade = CascadeType.ALL)
-    List<BandInfo> members;
+    @OneToMany(mappedBy = "codigo.band", cascade = CascadeType.ALL)
+    List<BandInfo> info;
     
 }

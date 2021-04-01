@@ -19,7 +19,7 @@ public interface VoiceMapper {
 	Voice toEntity(VoiceDTO dto);
 	
 	@Mappings({
-	      @Mapping(target="code", source="entity.code"),
+	      @Mapping(target="codigo", source="entity.codigo"),
 	      @Mapping(target="name", source="entity.name")
 	    })
 	VoiceDTO toDTO(Voice entity);

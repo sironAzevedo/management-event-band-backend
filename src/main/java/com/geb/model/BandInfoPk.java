@@ -2,8 +2,9 @@ package com.geb.model;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,10 +19,11 @@ import lombok.NoArgsConstructor;
 public class BandInfoPk implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
-	@Column(name = "ID_USER")
-    private Long userId;
+	@ManyToOne
+	@JoinColumn(name = "ID_USER")
+	private User user;
 
-    @Column(name = "ID_BAND")
-    private Long bandId;
-
+	@ManyToOne
+	@JoinColumn(name = "ID_BAND")
+    private Band band;
 }

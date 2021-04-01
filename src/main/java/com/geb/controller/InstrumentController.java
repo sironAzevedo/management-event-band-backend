@@ -32,8 +32,8 @@ public class InstrumentController {
 	@ResponseBody
 	@PreAuthorize("hasAnyRole('ROLE_ADMIN')")
 	@ResponseStatus(value = HttpStatus.CREATED)
-	public String create(@Valid @RequestBody InstrumentDTO dto) {
-		service.create(dto);
+	public String create(@Valid @RequestBody InstrumentDTO dto, @RequestParam(value="group") Long groupId) {
+		service.create(dto, groupId);
 		String res = "Cadastro realizado com sucesso";
 		return "{\"mensagem\": \"" + res + "\"}";
 	}
