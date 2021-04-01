@@ -1,5 +1,7 @@
 package com.geb.controller;
 
+import java.util.List;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +62,24 @@ public class UserController {
 		service.delete(code);
 		String res = "User deleted successfully";
 		return "{\"mensagem\": \"" + res + "\"}";
+	}
+	
+	@ResponseBody
+	@GetMapping(value = "/associate-instrument")
+	@ResponseStatus(value = HttpStatus.OK)
+	public void associateInstrument(
+			@RequestParam(value="userCode") Long code,
+			@RequestParam(value="instruments") List<Long> instruments) {
+		service.associateInstrument(code, instruments);
+	}
+	
+	@ResponseBody
+	@GetMapping(value = "/associate-voice")
+	@ResponseStatus(value = HttpStatus.OK)
+	public void associateVoice(
+			@RequestParam(value="userCode") Long code,
+			@RequestParam(value="instruments") List<Long> voices) {
+		service.associateVoice(code, voices);
 	}
 
 }

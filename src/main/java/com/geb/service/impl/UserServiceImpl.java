@@ -4,16 +4,22 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
+import com.geb.client.InstrumentClient;
+import com.geb.handler.exception.EmptyResultDataAccessException;
 import com.geb.handler.exception.UserException;
 import com.geb.mapper.UserMapper;
 import com.geb.model.Instrument;
 import com.geb.model.User;
+import com.geb.model.Voice;
+import com.geb.model.dto.InstrumentDTO;
 import com.geb.model.dto.UserDTO;
 import com.geb.repository.IUserPerository;
 import com.geb.service.IUserService;
@@ -26,6 +32,12 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
     
     @Autowired
     private UserMapper mapper;
+    
+    @Autowired
+    private InstrumentClient client;
+    
+    @Autowired
+	private HttpServletRequest request;
 
     @Override
     public void create(UserDTO user) {
@@ -62,7 +74,8 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 
     @Override
     public UserDTO findByEmail(String email) {
-    	return repo.findByEmail(email).map(mapper::toDTO).orElseThrow(()-> new UserException("User not found", HttpStatus.NOT_FOUND.value()));
+    	return repo.findByEmail(email).map(mapper::toDTO)
+    			.orElseThrow(()-> new UserException("User not found", HttpStatus.NOT_FOUND.value()));
     }
     
     @Override
@@ -73,10 +86,37 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 
 	@Override
 	public void associateInstrument(Long userCode, List<Long> instruments) {
-		repo.findById(userCode).orElseThrow(()-> new UserException("User not found", HttpStatus.NOT_FOUND.value()));
-		Set<Instrument> list = new HashSet<>();
-		
-		
-		
-	}  
+		User user = repo.findById(userCode).orElseThrow(()-> new UserException("User not found", HttpStatus.NOT_FOUND.value()));
+			Set<Instrument> list = new HashSet<>();
+			String token = request.getHeader("Authorization");
+			instruments.forEach(i -> {
+				try {
+					InstrumentDTO res = client.find(token, i);
+					list.add(Instrument.builder().codigo(res.getCodigo()).build());					
+				} catch (Exception e) {
+					throw new EmptyResultDataAccessException("Instrument not foud");
+				}
+			});
+			
+			user.setInstruments(list);
+			repo.save(user);
+	} 
+	
+	@Override
+	public void associateVoice(Long userCode, List<Long> voices) {
+		User user = repo.findById(userCode).orElseThrow(()-> new UserException("User not found", HttpStatus.NOT_FOUND.value()));
+			Set<Voice> list = new HashSet<>();
+			String token = request.getHeader("Authorization");
+			voices.forEach(i -> {
+				try {
+					InstrumentDTO res = client.find(token, i);
+					list.add(Voice.builder().codigo(res.getCodigo()).build());					
+				} catch (Exception e) {
+					throw new EmptyResultDataAccessException("Instrument not foud");
+				}
+			});
+			
+			user.setVoices(list);
+			repo.save(user);
+	} 
 }

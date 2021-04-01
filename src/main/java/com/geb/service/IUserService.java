@@ -15,4 +15,6 @@ public interface IUserService {
     UserDTO findByEmail(String email);
     
     void associateInstrument(Long userCode, List<Long> instruments);
+    
+    void associateVoice(Long userCode, List<Long> voices);
 }
