@@ -7,7 +7,9 @@ import lombok.Getter;
 @Getter
 public enum PerfilEnum {
 	ADMIN("ROLE_ADMIN"), 
-	USER("ROLE_USER");
+	USER("ROLE_USER"),
+	MODERATOR("ROLE_MODERATOR")
+	;
 	
 	private String codigo;
 	

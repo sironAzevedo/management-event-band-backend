@@ -9,10 +9,9 @@ import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -34,6 +33,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.geb.model.enums.PerfilEnum;
 import com.geb.model.enums.TypePersonEnum;
+import com.geb.model.enums.convert.TypePersonConvert;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -78,7 +78,7 @@ public class User implements UserDetails, Serializable {
     private String confirmPassword;
 
     @Column(name = "TYPE_USER")
-    @Enumerated(EnumType.STRING)
+    @Convert(converter = TypePersonConvert.class)
     private TypePersonEnum typeUser;
 
     @CreationTimestamp
@@ -89,22 +89,22 @@ public class User implements UserDetails, Serializable {
     @Column(name = "UPDATED_AT")
     private LocalDateTime updatedAt;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.ALL })
+    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.MERGE })
     @JoinTable(name = "TB_USER_ROLE", joinColumns = @JoinColumn(name = "ID_USER", referencedColumnName = "ID"),
             inverseJoinColumns = @JoinColumn(name = "ID_ROLE", referencedColumnName = "ID"))
     private Set<Role> roles;
     
-    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.ALL })
+    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.MERGE })
     @JoinTable(name = "TB_USER_INSTRUMENT", joinColumns = @JoinColumn(name = "ID_USER", referencedColumnName = "ID"),
             inverseJoinColumns = @JoinColumn(name = "ID_INSTRUMENT", referencedColumnName = "ID"))
     private Set<Instrument> instruments;
     
-    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.ALL })
+    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.MERGE })
     @JoinTable(name = "TB_USER_VOICE", joinColumns = @JoinColumn(name = "ID_USER", referencedColumnName = "ID"),
             inverseJoinColumns = @JoinColumn(name = "ID_VOICE", referencedColumnName = "ID"))
     private Set<Voice> voices;
     
-    @OneToMany(mappedBy = "codigo.user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "codigo.user", cascade = CascadeType.MERGE)
     List<BandInfo> bands;
 
     @Override

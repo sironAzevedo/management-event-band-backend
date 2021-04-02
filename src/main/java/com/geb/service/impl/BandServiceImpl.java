@@ -61,10 +61,7 @@ public class BandServiceImpl implements IBandService {
 
 	@Override
 	public void create(BandDTO dto) {
-		UserDTO user = this.getUser(dto.getMemberLeader());
-		Band band = repository.save(mapper.toEntity(dto));
-		BandInfo bandInfo = bandInfo(user, band);
-		bandInfoRepository.save(bandInfo);
+		repository.save(mapper.toEntity(dto));
 	}
 
 	@Override
@@ -77,7 +74,6 @@ public class BandServiceImpl implements IBandService {
 	public void delete(Long code) {
 		find(code);
 		repository.deleteById(code);
-
 	}
 
 	@Override
@@ -158,10 +154,11 @@ public class BandServiceImpl implements IBandService {
 		
 		List<BandDTO> result = new ArrayList<>();
 		List<BandInfo> bands = bandInfoRepository.findAssociatedBandsByUser(user.getCodigo());
-		for (BandInfo ub : bands) {
+		
+		bands.forEach(ub -> {
 			BandDTO band = mapper.toDTO(ub.getCodigo().getBand());
 			result.add(band);
-		}
+		});
 		
 		return result;
 	}

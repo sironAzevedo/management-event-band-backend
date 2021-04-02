@@ -1,6 +1,7 @@
 package com.geb.model.dto;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.constraints.Email;
@@ -9,10 +10,13 @@ import com.geb.model.enums.TypePersonEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
+@NoArgsConstructor
 @AllArgsConstructor
 public class UserDTO implements Serializable {
 
@@ -26,5 +30,5 @@ public class UserDTO implements Serializable {
     private String password;
     private String confirmPassword;
     private TypePersonEnum typeUser;
-    private List<String> roles;
+    @Default private List<String> roles = new ArrayList<>();
 }

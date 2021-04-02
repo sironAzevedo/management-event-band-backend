@@ -3,7 +3,6 @@ package com.geb.model;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
@@ -41,6 +40,6 @@ public class Role implements Serializable {
 	@Convert(converter = PerfilConvert.class)
 	private PerfilEnum perfil;
 	
-	@ManyToMany(mappedBy = "roles", cascade = CascadeType.ALL)
+	@ManyToMany(mappedBy = "roles")
 	private List<User> usuarios;
 }

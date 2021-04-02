@@ -58,16 +58,25 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 			throw new UserException("User exist", HttpStatus.BAD_REQUEST.value());
 		}
     	
+    	User entity = mapper.toEntity(user);
     	Set<Role> roles = new HashSet<>();
     	if(user.getRoles().isEmpty()) {
-    		roles.add(roleRepository.findByPerfil(PerfilEnum.USER));
+    		switch (user.getTypeUser()) {
+			case PF:
+				roles.add(roleRepository.findByPerfil(PerfilEnum.USER));
+				break;
+			case PJ:
+				roles.add(roleRepository.findByPerfil(PerfilEnum.MODERATOR));
+				break;
+			default:
+				roles.add(roleRepository.findByPerfil(PerfilEnum.USER));
+			}
     	} else {
     		user.getRoles().forEach(role -> {
     			roles.add(roleRepository.findByPerfil(PerfilEnum.from(role)));
     		});
     	}
     	
-    	User entity = mapper.toEntity(user);
     	entity.setRoles(roles);
     	repo.save(entity);
     }
