@@ -21,6 +21,7 @@ public class BandDTO implements Serializable {
     
     private Long codigo;
     private String name;
+    private String chavePj;
     
     @Email
     private String memberLeader;

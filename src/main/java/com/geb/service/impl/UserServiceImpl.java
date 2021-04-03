@@ -1,12 +1,16 @@
 package com.geb.service.impl;
 
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,9 +20,14 @@ import org.springframework.stereotype.Service;
 import com.geb.client.InstrumentClient;
 import com.geb.client.VoiceClient;
 import com.geb.handler.exception.EmptyResultDataAccessException;
+import com.geb.handler.exception.InternalErrorException;
+import com.geb.handler.exception.NotFoundException;
 import com.geb.handler.exception.UserException;
+import com.geb.mapper.AddressMapper;
 import com.geb.mapper.UserMapper;
 import com.geb.model.Instrument;
+import com.geb.model.PjAssociatedUser;
+import com.geb.model.PjChave;
 import com.geb.model.Role;
 import com.geb.model.User;
 import com.geb.model.Voice;
@@ -29,6 +38,7 @@ import com.geb.model.enums.PerfilEnum;
 import com.geb.repository.IRoleRepository;
 import com.geb.repository.IUserPerository;
 import com.geb.service.IUserService;
+import com.geb.util.Util;
 
 @Service
 public class UserServiceImpl implements IUserService, UserDetailsService {
@@ -58,30 +68,67 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 			throw new UserException("User exist", HttpStatus.BAD_REQUEST.value());
 		}
     	
-    	User entity = mapper.toEntity(user);
-    	Set<Role> roles = new HashSet<>();
-    	if(user.getRoles().isEmpty()) {
-    		switch (user.getTypeUser()) {
-			case PF:
-				roles.add(roleRepository.findByPerfil(PerfilEnum.USER));
-				break;
-			case PJ:
-				roles.add(roleRepository.findByPerfil(PerfilEnum.MODERATOR));
-				break;
-			default:
-				roles.add(roleRepository.findByPerfil(PerfilEnum.USER));
-			}
-    	} else {
-    		user.getRoles().forEach(role -> {
-    			roles.add(roleRepository.findByPerfil(PerfilEnum.from(role)));
-    		});
-    	}
-    	
-    	entity.setRoles(roles);
-    	repo.save(entity);
+    	try {
+    		User entity = mapper.toEntity(user);
+        	Set<Role> roles = new HashSet<>();
+        	user.getRoles().add(PerfilEnum.USER.getCodigo());
+        	
+        	user.getRoles().forEach(role -> {
+        		switch (user.getTypeUser()) {
+        		case PJ:
+        			roles.add(roleRepository.findByPerfil(PerfilEnum.MODERATOR));
+					entity.setChave(addPjChave(entity));
+        			break;
+        		case PF:				
+					roles.add(roleRepository.findByPerfil(PerfilEnum.from(role)));
+					entity.setAssociated(addAssociatedUser(user, entity));
+					break;	
+        		default:
+					throw new NotFoundException("Erro ao indentificar o tipo de pessoa");
+        		}
+        		
+    		}); 
+        	
+        	
+        	if(Objects.nonNull(user.getAddress())) {
+        		entity.setAddress(AddressMapper.INSTANCE.toEntity(user.getAddress()));
+        	}
+        	
+        	entity.setRoles(roles);
+        	repo.save(entity);
+        	
+		} catch (Exception e) {
+			throw new UserException(e.getLocalizedMessage(), HttpStatus.BAD_REQUEST.value());
+		}
     }
+    
+    private PjChave addPjChave(User entity) {
+		try {
+			return PjChave
+					.builder()
+					.chave(Util.generateKeyPJ())
+					.user(entity)
+					.build();
+		} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+			throw new InternalErrorException("Erro ao gerar chave PJ");
+		}
+	}
 
-    @Override
+	private PjAssociatedUser addAssociatedUser(UserDTO user, User entity) {
+		PjAssociatedUser res = null;
+		if(StringUtils.isNotBlank(user.getChavePj())) {
+			res = PjAssociatedUser
+					.builder()
+					.chave(user.getChavePj())
+					.user(entity)
+					.build();
+			
+			entity.setAssociated(res);
+		}
+		return res;
+	}
+
+	@Override
     public void Update(UserDTO user) {
     	if (repo.existsByEmail(user.getEmail())) {
 			throw new UserException("User not found", HttpStatus.NOT_FOUND.value());

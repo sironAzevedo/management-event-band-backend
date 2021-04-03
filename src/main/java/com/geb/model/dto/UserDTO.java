@@ -1,6 +1,7 @@
 package com.geb.model.dto;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,11 +25,15 @@ public class UserDTO implements Serializable {
 
     private Long codigo;
     private String name;
+    private String socialReason;
+    private LocalDate birthDate;
     @Email private String email;
     @Email private String confirmEmail;
     private String phone;
     private String password;
     private String confirmPassword;
     private TypePersonEnum typeUser;
+    private String chavePj;
+    private AddressDTO address;
     @Default private List<String> roles = new ArrayList<>();
 }

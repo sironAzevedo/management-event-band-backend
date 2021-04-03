@@ -2,19 +2,14 @@ package com.geb.model;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -31,19 +26,33 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "TB_BAND")
+@Table(name = "TB_ADDRESS")
 @EntityListeners(AuditingEntityListener.class)
-public class Band implements Serializable {
+public class Address implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
+	
 	@Id
-    @Column(name = "ID")
-    @GeneratedValue(generator = "BAND_ID_SEQ", strategy = GenerationType.IDENTITY)
-    @SequenceGenerator(name = "BAND_ID_SEQ", sequenceName = "BAND_ID_SEQ", allocationSize = 1)
+    @Column(name = "ID_USER")
     private Long codigo;
 
-    @Column(name = "NAME")
-    private String name;
+    @Column(name = "STREET")
+    private String street;
+    
+    @Column(name = "DISTRICT")
+    private String district;
+
+    @Column(name = "CITY")
+    private String city;
+    
+    @Column(name = "STATE")
+    private String state;
+    
+    @Column(name = "COUNTRY")
+    private String country;
+    
+    @Column(name = "CEP")
+    private String cep;
     
     @CreationTimestamp
     @Column(name = "CREATED_AT", nullable = false, updatable = false)
@@ -53,11 +62,8 @@ public class Band implements Serializable {
     @Column(name = "UPDATED_AT")
     private LocalDateTime updatedAt;
     
-    @OneToMany(mappedBy = "codigo.band", cascade = CascadeType.ALL)
-    List<BandInfo> info;
-    
-    @PrimaryKeyJoinColumn
-    @OneToOne(mappedBy = "band", cascade = CascadeType.ALL)
-    private PjAssociatedBand associated;
-    
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "ID_USER")
+    private User user;
 }

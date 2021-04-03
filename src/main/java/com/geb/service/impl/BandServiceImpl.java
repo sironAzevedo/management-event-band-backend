@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import com.geb.model.Band;
 import com.geb.model.BandInfo;
 import com.geb.model.BandInfoPk;
 import com.geb.model.Instrument;
+import com.geb.model.PjAssociatedBand;
 import com.geb.model.User;
 import com.geb.model.Voice;
 import com.geb.model.dto.BandDTO;
@@ -61,7 +63,18 @@ public class BandServiceImpl implements IBandService {
 
 	@Override
 	public void create(BandDTO dto) {
-		repository.save(mapper.toEntity(dto));
+		Band band = mapper.toEntity(dto);
+		
+		if(StringUtils.isNotBlank(dto.getChavePj())) {
+			PjAssociatedBand associated = PjAssociatedBand
+					.builder()
+					.chave(dto.getChavePj())
+					.band(band)
+					.build();
+			
+			band.setAssociated(associated);
+		}
+		repository.save(band);
 	}
 
 	@Override

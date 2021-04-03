@@ -1,6 +1,7 @@
 package com.geb.model;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -20,6 +21,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
@@ -59,6 +62,12 @@ public class User implements UserDetails, Serializable {
 
     @Column(name = "NAME")
     private String name;
+    
+    @Column(name = "SOCIAL_REASON")
+    private String socialReason;
+    
+    @Column(name = "BIRTH_DATE")
+    private LocalDate birthDate;
 
     @Email
     @Column(name = "EMAIL", unique = true)
@@ -88,6 +97,18 @@ public class User implements UserDetails, Serializable {
     @UpdateTimestamp
     @Column(name = "UPDATED_AT")
     private LocalDateTime updatedAt;
+    
+    @PrimaryKeyJoinColumn
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private PjChave chave;
+    
+    @PrimaryKeyJoinColumn
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private PjAssociatedUser associated;
+    
+    @PrimaryKeyJoinColumn
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Address address;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.MERGE })
     @JoinTable(name = "TB_USER_ROLE", joinColumns = @JoinColumn(name = "ID_USER", referencedColumnName = "ID"),

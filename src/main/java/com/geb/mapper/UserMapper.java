@@ -20,6 +20,8 @@ public abstract class UserMapper {
                 .builder()
                 .name(dto.getName())
                 .email(dto.getEmail())
+                .socialReason(dto.getSocialReason())
+                .birthDate(dto.getBirthDate())
                 .confirmEmail(dto.getConfirmEmail())
                 .phone(dto.getPhone())
                 .password(password)
