@@ -76,6 +76,7 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
         	user.getRoles().forEach(role -> {
         		switch (user.getTypeUser()) {
         		case PJ:
+        			roles.add(roleRepository.findByPerfil(PerfilEnum.from(role)));
         			roles.add(roleRepository.findByPerfil(PerfilEnum.MODERATOR));
 					entity.setChave(addPjChave(entity));
         			break;
