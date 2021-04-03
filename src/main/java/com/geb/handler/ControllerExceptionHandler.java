@@ -16,6 +16,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.geb.handler.exception.AuthorizationException;
+import com.geb.handler.exception.BandException;
 import com.geb.handler.exception.EmptyResultDataAccessException;
 import com.geb.handler.exception.InternalErrorException;
 import com.geb.handler.exception.NotFoundException;
@@ -34,6 +35,13 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 	@ResponseBody
 	@ExceptionHandler(UserException.class)
 	public ResponseEntity<StandardError> userExecption(UserException e, HttpServletRequest request) {
+		StandardError error = StandardError.builder(e.getStatus(), e.getMessage(), new Date());
+		return new ResponseEntity<>(error, HttpStatus.valueOf(e.getStatus()));
+	}
+	
+	@ResponseBody
+	@ExceptionHandler(BandException.class)
+	public ResponseEntity<StandardError> bandExecption(BandException e, HttpServletRequest request) {
 		StandardError error = StandardError.builder(e.getStatus(), e.getMessage(), new Date());
 		return new ResponseEntity<>(error, HttpStatus.valueOf(e.getStatus()));
 	}

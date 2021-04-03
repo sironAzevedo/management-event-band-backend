@@ -42,6 +42,7 @@ public class BandController {
 	@DeleteMapping
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
+	@PreAuthorize("hasRole('ROLE_MODERATOR') or hasRole('ROLE_ADMIN')")
 	public void delete(@RequestParam(value="code") Long code) {
 		service.delete(code);
 	}
@@ -56,6 +57,7 @@ public class BandController {
 	@ResponseBody
 	@GetMapping(value = "/associate-member")
 	@ResponseStatus(value = HttpStatus.OK)
+	@PreAuthorize("hasRole('ROLE_MODERATOR') or hasRole('ROLE_ADMIN') or hasRole('ROLE_LEADER_BAND')")
 	public void associateMembers(
 			@RequestParam(value="band_code") Long code,
 			@RequestParam(value="email_member") String email,
@@ -68,6 +70,7 @@ public class BandController {
 	@ResponseBody
 	@GetMapping(value = "/disassociate-member")
 	@ResponseStatus(value = HttpStatus.OK)
+	@PreAuthorize("hasRole('ROLE_MODERATOR') or hasRole('ROLE_ADMIN') or hasRole('ROLE_LEADER_BAND')")
 	public void disassociateMembers(
 			@RequestParam(value="band_code") Long code,
 			@RequestParam(value="email_member") String email) {

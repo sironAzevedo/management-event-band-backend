@@ -8,11 +8,15 @@ public interface IUserService {
 
     void create(UserDTO user);
 
-    void Update(UserDTO user);
+    void update(UserDTO user);
+    
+    void addRole(Long code, String role);
 
     void delete(Long code);
 
     UserDTO findByEmail(String email);
+    
+    UserDTO findByChave(String chave);
     
     void associateInstrument(Long userCode, List<Long> instruments);
     

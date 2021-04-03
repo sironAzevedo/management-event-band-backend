@@ -16,7 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.geb.client.InstrumentClient;
 import com.geb.client.UserClient;
 import com.geb.client.VoiceClient;
+import com.geb.handler.exception.BandException;
 import com.geb.handler.exception.EmptyResultDataAccessException;
+import com.geb.handler.exception.NotFoundException;
 import com.geb.handler.exception.UserException;
 import com.geb.mapper.BandMapper;
 import com.geb.model.Band;
@@ -32,6 +34,7 @@ import com.geb.model.dto.MembersDTO;
 import com.geb.model.dto.UserDTO;
 import com.geb.model.dto.VoiceDTO;
 import com.geb.model.enums.LeaderEnum;
+import com.geb.model.enums.PerfilEnum;
 import com.geb.repository.IBandInfoRepository;
 import com.geb.repository.IBandPerository;
 import com.geb.service.IBandService;
@@ -96,44 +99,44 @@ public class BandServiceImpl implements IBandService {
 
 	@Override
 	public void associateMembers(Long codeBand, String emailMember, Boolean leader, Long instrumentCode, Long voiceCode) {
-		String token = request.getHeader("Authorization");
+		String token = getToken();
+		String msg = "Apenas o leader ou o dono desta banda pode realizar essa operação";
 		
 		UserDTO user = this.getUser(emailMember);
 		Band band = repository.findById(codeBand).orElseThrow(()-> new EmptyResultDataAccessException("Band not found"));
 		
-		Instrument instrument = null;
-		Voice voice = null;
-
-		if(Objects.nonNull(instrumentCode)) {
-			try {
-				InstrumentDTO res = instrumentClient.find(token, instrumentCode);
-				instrument = Instrument.builder().codigo(res.getCodigo()).build();
-			} catch (Exception e) {
-				throw new EmptyResultDataAccessException("Instrument not foud");
-			}
-		}
 		
-		if(Objects.nonNull(voiceCode)) {
-			try {
-				VoiceDTO res = voiceClient.find(token, voiceCode);
-				voice = Voice.builder().codigo(res.getCodigo()).build();
-			} catch (Exception e) {
-				throw new EmptyResultDataAccessException("Voice not foud");
+		if(isManager(token, band)) {
+			Instrument instrument = Objects.nonNull(instrumentCode) ? addInstrument(token, instrumentCode) : null;
+			Voice voice = Objects.nonNull(voiceCode) ? addVoice(token, voiceCode) : null;
+			
+			BandInfo bandInfo = bandInfo(user, band);
+			bandInfo.setInstrument(instrument);
+			bandInfo.setVoice(voice);
+			
+			if(leader) {
+				bandInfo.setLeader(LeaderEnum.S);
+				userClient.addRole(token, user.getCodigo(), PerfilEnum.LEADER_BAND.getCodigo());
+			} else {
+				bandInfo.setLeader(LeaderEnum.N);
 			}
+			
+			bandInfoRepository.save(bandInfo);
+		} else {
+			throw new BandException(msg, HttpStatus.BAD_REQUEST.value());
 		}
-		
-		BandInfo bandInfo = bandInfo(user, band);
-		bandInfo.setInstrument(instrument);
-		bandInfo.setVoice(voice);
-		bandInfo.setLeader(leader ? LeaderEnum.S : LeaderEnum.N);
-		bandInfoRepository.save(bandInfo);
 	} 
-	
+
 	@Override
 	public void disassociateMembers(Long codeBand, String emailMember) {
-		find(codeBand);
-		UserDTO user = this.getUser(emailMember);
-		bandInfoRepository.disassociateMembers(codeBand, user.getCodigo());
+		Band band = repository.findById(codeBand).orElseThrow(()-> new EmptyResultDataAccessException("Band not found"));
+		String msg = "Apenas o leader ou o dono desta banda pode realizar essa operação";
+		if(isManager(getToken(), band)) {
+			UserDTO user = this.getUser(emailMember);
+			bandInfoRepository.disassociateMembers(codeBand, user.getCodigo());
+		} else {
+			throw new BandException(msg, HttpStatus.BAD_REQUEST.value());
+		}
 	}
 	
 	@Override
@@ -177,8 +180,7 @@ public class BandServiceImpl implements IBandService {
 	}
 	
 	private UserDTO getUser(String user) {
-		String token = request.getHeader("Authorization");
-		return Optional.ofNullable(userClient.findByEmail(token, user)).orElseThrow(() -> new UserException("User not found", HttpStatus.BAD_REQUEST.value()));
+		return Optional.ofNullable(userClient.findByEmail(getToken(), user)).orElseThrow(() -> new UserException("User not found", HttpStatus.BAD_REQUEST.value()));
 	}
 	
 	private BandInfo bandInfo(UserDTO user, Band band) {
@@ -194,5 +196,48 @@ public class BandServiceImpl implements IBandService {
 				.codigo(pk)
 				.build();
 		return userBand;
+	}
+	
+	private Instrument addInstrument(String token, Long instrumentCode) {
+		try {
+			InstrumentDTO res = instrumentClient.find(token, instrumentCode);
+			return Instrument.builder().codigo(res.getCodigo()).build();
+		} catch (Exception e) {
+			throw new NotFoundException("Instrument not foud");
+		}
+	}
+	
+	private Voice addVoice(String token, Long voiceCode) {
+		try {
+			VoiceDTO res = voiceClient.find(token, voiceCode);
+			return Voice.builder().codigo(res.getCodigo()).build();
+		} catch (Exception e) {
+			throw new EmptyResultDataAccessException("Voice not foud");
+		}
+	}
+	
+	private boolean isManager(String token, Band band) {
+		User userAuth = AuthService.authenticated();
+		UserDTO userModerator = userClient.findByKey(token, band.getAssociated().getChave());
+		
+		if(userAuth.hasRole(PerfilEnum.ADMIN)) {
+			return true;
+		} else if(userModerator.getEmail().equals(userAuth.getEmail())) {
+			return true;
+		} else {
+			for (BandInfo i : band.getInfo()) {
+				if(LeaderEnum.S.equals(i.getLeader())) {
+					String emailLeader = i.getCodigo().getUser().getEmail();
+					if(emailLeader.equals(userAuth.getEmail())) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+	
+	private String getToken() {
+		return request.getHeader("Authorization");
 	}
 }

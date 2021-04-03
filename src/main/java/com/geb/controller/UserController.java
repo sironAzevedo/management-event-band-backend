@@ -7,6 +7,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,7 +42,7 @@ public class UserController {
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)
 	public String update(@Valid @RequestBody UserDTO dto) {
-		service.Update(dto);
+		service.update(dto);
 		String res = "Cadastro atualizado com sucesso";
 		return "{\"mensagem\": \"" + res + "\"}";
 	}
@@ -79,6 +80,23 @@ public class UserController {
 			@RequestParam(value="user_code") Long code,
 			@RequestParam(value="voices") List<Long> voices) {
 		service.associateVoice(code, voices);
+	}
+	
+	@ResponseBody
+	@PutMapping(value = "/role")
+	@ResponseStatus(value = HttpStatus.OK)
+	@PreAuthorize("hasRole('ROLE_MODERATOR') or hasRole('ROLE_ADMIN')")
+	public void addRole(
+			@RequestParam(value="code") Long code,
+			@RequestParam(value="role") String role) {
+		service.addRole(code, role);
+	}
+	
+	@ResponseBody
+	@GetMapping(value = "/by-key")
+	@ResponseStatus(value = HttpStatus.OK)
+	public UserDTO findByKey(@RequestParam(value="chave") String chave) {
+		return service.findByChave(chave);
 	}
 
 }

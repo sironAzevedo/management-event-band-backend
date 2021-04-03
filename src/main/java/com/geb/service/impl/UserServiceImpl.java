@@ -87,7 +87,6 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
         		default:
 					throw new NotFoundException("Erro ao indentificar o tipo de pessoa");
         		}
-        		
     		}); 
         	
         	
@@ -102,42 +101,19 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 			throw new UserException(e.getLocalizedMessage(), HttpStatus.BAD_REQUEST.value());
 		}
     }
-    
-    private PjChave addPjChave(User entity) {
-		try {
-			return PjChave
-					.builder()
-					.chave(Util.generateKeyPJ())
-					.user(entity)
-					.build();
-		} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-			throw new InternalErrorException("Erro ao gerar chave PJ");
-		}
-	}
-
-	private PjAssociatedUser addAssociatedUser(UserDTO user, User entity) {
-		PjAssociatedUser res = null;
-		if(StringUtils.isNotBlank(user.getChavePj())) {
-			res = PjAssociatedUser
-					.builder()
-					.chave(user.getChavePj())
-					.user(entity)
-					.build();
-			
-			entity.setAssociated(res);
-		}
-		return res;
-	}
 
 	@Override
-    public void Update(UserDTO user) {
+    public void update(UserDTO user) {
     	if (repo.existsByEmail(user.getEmail())) {
 			throw new UserException("User not found", HttpStatus.NOT_FOUND.value());
 		}
-    	
     	AuthService.authenticated(user.getEmail());
     	
     	User entity = mapper.toEntity(user);
+    	if(Objects.nonNull(user.getAddress())) {
+    		entity.setAddress(AddressMapper.INSTANCE.toEntity(user.getAddress()));
+    	}
+    	
     	repo.save(entity);
     }
 
@@ -208,4 +184,46 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 			user.setVoices(list);
 			repo.save(user);
 	} 
+	
+	@Override
+	public void addRole(Long code, String role) {
+		User user = repo.findById(code).orElseThrow(()-> new UserException("User not found", HttpStatus.NOT_FOUND.value()));
+		Set<Role> roles = new HashSet<>();
+		roles.add(roleRepository.findByPerfil(PerfilEnum.from(role)));
+		user.setRoles(roles);
+    	repo.save(user);
+		
+	}
+	
+	@Override
+	public UserDTO findByChave(String chave) {
+		return repo.findByAssociatedChave(chave).map(mapper::toDTO)
+				.orElseThrow(()-> new UserException("User not found", HttpStatus.NOT_FOUND.value()));
+	}
+	
+	private PjChave addPjChave(User entity) {
+		try {
+			return PjChave
+					.builder()
+					.chave(Util.generateKeyPJ())
+					.user(entity)
+					.build();
+		} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+			throw new InternalErrorException("Erro ao gerar chave PJ");
+		}
+	}
+
+	private PjAssociatedUser addAssociatedUser(UserDTO user, User entity) {
+		PjAssociatedUser res = null;
+		if(StringUtils.isNotBlank(user.getChavePj())) {
+			res = PjAssociatedUser
+					.builder()
+					.chave(user.getChavePj())
+					.user(entity)
+					.build();
+			
+			entity.setAssociated(res);
+		}
+		return res;
+	}
 }

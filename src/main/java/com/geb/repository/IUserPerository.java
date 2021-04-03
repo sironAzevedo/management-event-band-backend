@@ -12,4 +12,6 @@ public interface IUserPerository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
 
     Boolean existsByEmail(String email);
+    
+    Optional<User> findByAssociatedChave(String chave);
 }

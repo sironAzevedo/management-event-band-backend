@@ -16,7 +16,7 @@ public final class AuthService {
 			throw new UserException(e.getLocalizedMessage());
 		}
 	}
-
+	
 	public static void authenticated(String email) {
 		User user = authenticated();
 
@@ -24,4 +24,18 @@ public final class AuthService {
 			throw new AuthorizationException("Acesso negado");
 		}
 	}
+
+//	public static void authenticated(String email) {
+//		User user = authenticated();
+//
+//		if (user == null || 
+//				!isAuthorized(user) &&
+//				!email.equals(user.getEmail())) {
+//			throw new AuthorizationException("Acesso negado");
+//		}
+//	}
+	
+//	private static Boolean isAuthorized(User user) {
+//		return (user.hasRole(PerfilEnum.ADMIN) || user.hasRole(PerfilEnum.MODERATOR));
+//	}
 }

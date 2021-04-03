@@ -12,4 +12,14 @@ public class UserFallbackFactory implements UserClient {
 	public UserDTO findByEmail(String bearerToken, String email) {
 		return null;
 	}
+
+	@Override
+	public void addRole(String bearerToken, Long code, String role) {
+		
+	}
+
+	@Override
+	public UserDTO findByKey(String bearerToken, String chave) {
+		return null;
+	}
 }
