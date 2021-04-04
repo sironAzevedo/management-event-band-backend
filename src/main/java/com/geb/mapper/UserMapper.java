@@ -1,5 +1,7 @@
 package com.geb.mapper;
 
+import java.util.Objects;
+
 import org.mapstruct.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -32,7 +34,6 @@ public abstract class UserMapper {
     }
     
     public UserDTO toDTO(User user) {
-    	String chave = TypePersonEnum.PF.equals(user.getTypeUser()) ? user.getAssociated().getChave() : user.getChave().getChave();
     	return UserDTO
                 .builder()
                 .codigo(user.getCodigo())
@@ -43,7 +44,18 @@ public abstract class UserMapper {
                 .password(user.getPassword())
                 .confirmPassword(user.getConfirmPassword())
                 .typeUser(user.getTypeUser())
-                .chavePj(chave)
+                .chavePj(getChave(user))
                 .build();
+    }
+    
+    private String getChave(User user) {
+    	if(TypePersonEnum.PF.equals(user.getTypeUser())) {
+    		if(Objects.nonNull(user.getAssociated())) {
+    			return user.getAssociated().getChave();
+    		} else if((Objects.nonNull(user.getChave()))){
+    			return user.getChave().getChave();
+    		}
+    	}
+    	return null;
     }
 }
