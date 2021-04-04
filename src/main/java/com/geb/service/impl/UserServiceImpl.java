@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import com.geb.handler.exception.NotFoundException;
 import com.geb.handler.exception.UserException;
 import com.geb.mapper.AddressMapper;
 import com.geb.mapper.UserMapper;
+import com.geb.model.Address;
 import com.geb.model.Instrument;
 import com.geb.model.PjAssociatedUser;
 import com.geb.model.PjChave;
@@ -41,6 +43,7 @@ import com.geb.service.IUserService;
 import com.geb.util.Util;
 
 @Service
+@Transactional
 public class UserServiceImpl implements IUserService, UserDetailsService {
 
     @Autowired
@@ -91,7 +94,9 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
         	
         	
         	if(Objects.nonNull(user.getAddress())) {
-        		entity.setAddress(AddressMapper.INSTANCE.toEntity(user.getAddress()));
+        		Address address = AddressMapper.INSTANCE.toEntity(user.getAddress());
+        		address.setUser(entity);
+        		entity.setAddress(address);
         	}
         	
         	entity.setRoles(roles);
@@ -187,18 +192,24 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 	
 	@Override
 	public void addRole(Long code, String role) {
+		AuthService.authAdminOrModerator();
 		User user = repo.findById(code).orElseThrow(()-> new UserException("User not found", HttpStatus.NOT_FOUND.value()));
-		Set<Role> roles = new HashSet<>();
+		Set<Role> roles = user.getRoles();
 		roles.add(roleRepository.findByPerfil(PerfilEnum.from(role)));
 		user.setRoles(roles);
     	repo.save(user);
-		
+	}
+	
+	@Override
+	public void disassociatePerfilUser(Long user, String role) {
+		Role perfil = roleRepository.findByPerfil(PerfilEnum.from(role));
+		roleRepository.disassociatePerfilUser(user, perfil.getCodigo());
 	}
 	
 	@Override
 	public UserDTO findByChave(String chave) {
-		return repo.findByAssociatedChave(chave).map(mapper::toDTO)
-				.orElseThrow(()-> new UserException("User not found", HttpStatus.NOT_FOUND.value()));
+		return repo.findByChaveChave(chave).map(mapper::toDTO)
+				.orElseThrow(()-> new UserException("key not found", HttpStatus.NOT_FOUND.value()));
 	}
 	
 	private PjChave addPjChave(User entity) {
@@ -216,13 +227,15 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 	private PjAssociatedUser addAssociatedUser(UserDTO user, User entity) {
 		PjAssociatedUser res = null;
 		if(StringUtils.isNotBlank(user.getChavePj())) {
-			res = PjAssociatedUser
-					.builder()
-					.chave(user.getChavePj())
-					.user(entity)
-					.build();
-			
-			entity.setAssociated(res);
+			if(Objects.nonNull(findByChave(user.getChavePj()))) {
+				res = PjAssociatedUser
+						.builder()
+						.chave(user.getChavePj())
+						.user(entity)
+						.build();
+				
+				entity.setAssociated(res);
+			}
 		}
 		return res;
 	}

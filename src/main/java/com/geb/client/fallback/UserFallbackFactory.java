@@ -22,4 +22,9 @@ public class UserFallbackFactory implements UserClient {
 	public UserDTO findByKey(String bearerToken, String chave) {
 		return null;
 	}
+
+	@Override
+	public void disassociatePerfilUser(String bearerToken, Long code, String role) {
+		
+	}
 }

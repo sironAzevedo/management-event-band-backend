@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -70,6 +71,13 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 	public StandardError authorizationException(AuthorizationException e, HttpServletRequest request) {		
 		return StandardError.builder(HttpStatus.FORBIDDEN.value(), e.getMessage(), new Date());
 	} 
+	
+	@ResponseBody
+	@ExceptionHandler(AccessDeniedException.class)
+	@ResponseStatus(value = HttpStatus.FORBIDDEN)
+	public StandardError authorizationException(AccessDeniedException e, HttpServletRequest request) {		
+		return StandardError.builder(HttpStatus.FORBIDDEN.value(), e.getMessage(), new Date());
+	}
 
 	@Override
 	protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers,

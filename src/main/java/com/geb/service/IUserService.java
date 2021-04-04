@@ -21,4 +21,6 @@ public interface IUserService {
     void associateInstrument(Long userCode, List<Long> instruments);
     
     void associateVoice(Long userCode, List<Long> voices);
+    
+    void disassociatePerfilUser(Long user, String role);
 }

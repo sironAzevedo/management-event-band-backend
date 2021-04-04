@@ -24,6 +24,13 @@ public final class AuthService {
 			throw new AuthorizationException("Acesso negado");
 		}
 	}
+	
+	public static void authAdminOrModerator() {
+		User user = authenticated();
+		if(user == null || !(user.hasRole(PerfilEnum.ADMIN) || user.hasRole(PerfilEnum.MODERATOR))) {
+			throw new AuthorizationException("Acesso negado");
+		}
+	}
 
 //	public static void authenticated(String email) {
 //		User user = authenticated();

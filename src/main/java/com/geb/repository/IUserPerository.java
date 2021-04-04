@@ -13,5 +13,9 @@ public interface IUserPerository extends JpaRepository<User, Long> {
 
     Boolean existsByEmail(String email);
     
-    Optional<User> findByAssociatedChave(String chave);
+    
+    Optional<User> findByChaveChave(String chave);
+    
+//    @Query("select u from User u where u.associated.chave = :chave")
+//    Optional<User> findByAssociatedChave(@Param("chave") String chave);
 }

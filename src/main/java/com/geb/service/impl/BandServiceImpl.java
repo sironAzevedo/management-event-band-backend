@@ -66,16 +66,18 @@ public class BandServiceImpl implements IBandService {
 
 	@Override
 	public void create(BandDTO dto) {
+		AuthService.authAdminOrModerator();
 		Band band = mapper.toEntity(dto);
-		
 		if(StringUtils.isNotBlank(dto.getChavePj())) {
-			PjAssociatedBand associated = PjAssociatedBand
-					.builder()
-					.chave(dto.getChavePj())
-					.band(band)
-					.build();
-			
-			band.setAssociated(associated);
+			if(Objects.nonNull(userClient.findByKey(getToken(), dto.getChavePj()))) {
+				PjAssociatedBand associated = PjAssociatedBand
+						.builder()
+						.chave(dto.getChavePj())
+						.band(band)
+						.build();
+				
+				band.setAssociated(associated);
+			}
 		}
 		repository.save(band);
 	}
@@ -88,7 +90,11 @@ public class BandServiceImpl implements IBandService {
 
 	@Override
 	public void delete(Long code) {
-		find(code);
+		Band band = repository.findById(code).orElseThrow(()-> new EmptyResultDataAccessException("Band not found"));
+		if(!isManager(getToken(), band)) {
+			throw new BandException("Apenas o dono desta banda pode realizar essa operação", HttpStatus.BAD_REQUEST.value());
+		}
+		
 		repository.deleteById(code);
 	}
 
@@ -105,37 +111,41 @@ public class BandServiceImpl implements IBandService {
 		UserDTO user = this.getUser(emailMember);
 		Band band = repository.findById(codeBand).orElseThrow(()-> new EmptyResultDataAccessException("Band not found"));
 		
-		
-		if(isManager(token, band)) {
-			Instrument instrument = Objects.nonNull(instrumentCode) ? addInstrument(token, instrumentCode) : null;
-			Voice voice = Objects.nonNull(voiceCode) ? addVoice(token, voiceCode) : null;
-			
-			BandInfo bandInfo = bandInfo(user, band);
-			bandInfo.setInstrument(instrument);
-			bandInfo.setVoice(voice);
-			
-			if(leader) {
-				bandInfo.setLeader(LeaderEnum.S);
-				userClient.addRole(token, user.getCodigo(), PerfilEnum.LEADER_BAND.getCodigo());
-			} else {
-				bandInfo.setLeader(LeaderEnum.N);
-			}
-			
-			bandInfoRepository.save(bandInfo);
-		} else {
+		if(!isManager(token, band)) {
 			throw new BandException(msg, HttpStatus.BAD_REQUEST.value());
 		}
+		
+		Instrument instrument = Objects.nonNull(instrumentCode) ? addInstrument(token, instrumentCode) : null;
+		Voice voice = Objects.nonNull(voiceCode) ? addVoice(token, voiceCode) : null;
+		
+		BandInfo bandInfo = bandInfo(user, band);
+		bandInfo.setInstrument(instrument);
+		bandInfo.setVoice(voice);
+		
+		if(leader) {
+			bandInfo.setLeader(LeaderEnum.S);
+			userClient.addRole(token, user.getCodigo(), PerfilEnum.LEADER_BAND.getCodigo());
+		} else {
+			bandInfo.setLeader(LeaderEnum.N);
+		}
+		
+		bandInfoRepository.save(bandInfo);
 	} 
 
 	@Override
 	public void disassociateMembers(Long codeBand, String emailMember) {
 		Band band = repository.findById(codeBand).orElseThrow(()-> new EmptyResultDataAccessException("Band not found"));
 		String msg = "Apenas o leader ou o dono desta banda pode realizar essa operação";
-		if(isManager(getToken(), band)) {
-			UserDTO user = this.getUser(emailMember);
-			bandInfoRepository.disassociateMembers(codeBand, user.getCodigo());
-		} else {
+		if(!isManager(getToken(), band)) {
 			throw new BandException(msg, HttpStatus.BAD_REQUEST.value());
+		}
+		
+		UserDTO user = this.getUser(emailMember);
+		bandInfoRepository.disassociateMembers(codeBand, user.getCodigo());
+		
+		List<BandInfo> leaderBands = bandInfoRepository.findByBandsLeaderByUser(user.getCodigo(), LeaderEnum.S);
+		if(leaderBands.isEmpty()) {
+			userClient.disassociatePerfilUser(getToken(), user.getCodigo(), PerfilEnum.LEADER_BAND.getCodigo());
 		}
 	}
 	
@@ -169,7 +179,18 @@ public class BandServiceImpl implements IBandService {
 		AuthService.authenticated(user.getEmail());
 		
 		List<BandDTO> result = new ArrayList<>();
-		List<BandInfo> bands = bandInfoRepository.findAssociatedBandsByUser(user.getCodigo());
+		List<BandInfo> bands = new ArrayList<>();
+		
+		switch (user.getTypeUser()) {
+		case PF:
+			bands = bandInfoRepository.findAssociatedBandsByUser(user.getCodigo());
+			break;
+		case PJ:
+			bands = bandInfoRepository.findAssociatedBandsByUserPj(user.getChavePj());
+			break;
+		default:
+			throw new NotFoundException("Erro ao indentificar o tipo de pessoa");
+		}
 		
 		bands.forEach(ub -> {
 			BandDTO band = mapper.toDTO(ub.getCodigo().getBand());

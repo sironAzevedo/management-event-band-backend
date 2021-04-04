@@ -6,6 +6,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.geb.model.User;
 import com.geb.model.dto.UserDTO;
+import com.geb.model.enums.TypePersonEnum;
 
 @Mapper(componentModel = "spring")
 public abstract class UserMapper {
@@ -31,6 +32,7 @@ public abstract class UserMapper {
     }
     
     public UserDTO toDTO(User user) {
+    	String chave = TypePersonEnum.PF.equals(user.getTypeUser()) ? user.getAssociated().getChave() : user.getChave().getChave();
     	return UserDTO
                 .builder()
                 .codigo(user.getCodigo())
@@ -41,6 +43,7 @@ public abstract class UserMapper {
                 .password(user.getPassword())
                 .confirmPassword(user.getConfirmPassword())
                 .typeUser(user.getTypeUser())
+                .chavePj(chave)
                 .build();
     }
 }

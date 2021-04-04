@@ -7,7 +7,6 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,7 +31,6 @@ public class BandController {
 	@PostMapping
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.CREATED)
-	@PreAuthorize("hasRole('ROLE_MODERATOR') or hasRole('ROLE_ADMIN')")
 	public String create(@Valid @RequestBody BandDTO dto) {
 		service.create(dto);
 		String res = "Cadastro realizado com sucesso";
@@ -42,7 +40,6 @@ public class BandController {
 	@DeleteMapping
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
-	@PreAuthorize("hasRole('ROLE_MODERATOR') or hasRole('ROLE_ADMIN')")
 	public void delete(@RequestParam(value="code") Long code) {
 		service.delete(code);
 	}
@@ -57,7 +54,6 @@ public class BandController {
 	@ResponseBody
 	@GetMapping(value = "/associate-member")
 	@ResponseStatus(value = HttpStatus.OK)
-	@PreAuthorize("hasRole('ROLE_MODERATOR') or hasRole('ROLE_ADMIN') or hasRole('ROLE_LEADER_BAND')")
 	public void associateMembers(
 			@RequestParam(value="band_code") Long code,
 			@RequestParam(value="email_member") String email,
@@ -68,9 +64,8 @@ public class BandController {
 	}
 	
 	@ResponseBody
-	@GetMapping(value = "/disassociate-member")
+	@DeleteMapping(value = "/disassociate-member")
 	@ResponseStatus(value = HttpStatus.OK)
-	@PreAuthorize("hasRole('ROLE_MODERATOR') or hasRole('ROLE_ADMIN') or hasRole('ROLE_LEADER_BAND')")
 	public void disassociateMembers(
 			@RequestParam(value="band_code") Long code,
 			@RequestParam(value="email_member") String email) {

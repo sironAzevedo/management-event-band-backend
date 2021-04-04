@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.validation.constraints.Email;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.geb.model.enums.TypePersonEnum;
 
 import lombok.AllArgsConstructor;
@@ -19,6 +20,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class UserDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;

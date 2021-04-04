@@ -2,6 +2,7 @@ package com.geb.client;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -29,5 +30,9 @@ public interface UserClient {
 	@PutMapping(value = "/role")
 	@Headers("Content-Type: application/json")
 	void addRole(@RequestHeader(AUTH_TOKEN) String bearerToken, @RequestParam Long code, @RequestParam String role);
+	
+	@DeleteMapping(value = "/disassociate-perfil")
+	@Headers("Content-Type: application/json")
+	void disassociatePerfilUser(@RequestHeader(AUTH_TOKEN) String bearerToken, @RequestParam Long code, @RequestParam String role);
 
 }
