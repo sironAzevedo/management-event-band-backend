@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -178,25 +179,14 @@ public class BandServiceImpl implements IBandService {
 		UserDTO user = this.getUser(email);
 		AuthService.authenticated(user.getEmail());
 		
-		List<BandDTO> result = new ArrayList<>();
-		List<BandInfo> bands = new ArrayList<>();
-		
 		switch (user.getTypeUser()) {
 		case PF:
-			bands = bandInfoRepository.findAssociatedBandsByUser(user.getCodigo());
-			break;
+			return repository.findByUserPF(user.getEmail()).stream().map(mapper::toDTO).collect(Collectors.toList());
 		case PJ:
-			bands = bandInfoRepository.findAssociatedBandsByUserPj(user.getChavePj());
-			break;
+			return repository.findByUserPJ(user.getChavePj()).stream().map(mapper::toDTO).collect(Collectors.toList());
 		default:
 			throw new NotFoundException("Erro ao indentificar o tipo de pessoa");
 		}
-		
-		bands.forEach(ub -> {
-			result.add(mapper.toDTO(ub.getCodigo().getBand()));
-		});
-		
-		return result;
 	}
 	
 	private UserDTO getUser(String user) {

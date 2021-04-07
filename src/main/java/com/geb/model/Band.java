@@ -18,6 +18,8 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -53,8 +55,9 @@ public class Band implements Serializable {
     @Column(name = "UPDATED_AT")
     private LocalDateTime updatedAt;
     
+    @Fetch(FetchMode.SUBSELECT)
     @OneToMany(mappedBy = "codigo.band", cascade = CascadeType.ALL)
-    List<BandInfo> info;
+    private List<BandInfo> info;
     
     @PrimaryKeyJoinColumn
     @OneToOne(mappedBy = "band", cascade = CascadeType.ALL)
