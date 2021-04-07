@@ -52,10 +52,11 @@ public abstract class UserMapper {
     	if(TypePersonEnum.PF.equals(user.getTypeUser())) {
     		if(Objects.nonNull(user.getAssociated())) {
     			return user.getAssociated().getChave();
-    		} else if((Objects.nonNull(user.getChave()))){
-    			return user.getChave().getChave();
-    		}
-    	}
+    		} 
+    	} else if((Objects.nonNull(user.getChave()))){
+			return user.getChave().getChave();
+		}
+    	
     	return null;
     }
 }
