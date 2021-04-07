@@ -1,5 +1,7 @@
 package com.geb.mapper;
 
+import java.util.Objects;
+
 import org.mapstruct.Mapper;
 
 import com.geb.model.Band;
@@ -24,11 +26,14 @@ public abstract class BandMapper {
 				.map(m -> m.getCodigo().getUser().getName())
 				.orElse(null);
 		
+		String chavePj = Objects.nonNull(band.getAssociated()) ? band.getAssociated().getChave() : null;
+		
 		return BandDTO
 				.builder()
 				.codigo(band.getCodigo())
 				.name(band.getName())
 				.memberLeader(leader)
+				.chavePj(chavePj)
 				.build();
 	}
 
