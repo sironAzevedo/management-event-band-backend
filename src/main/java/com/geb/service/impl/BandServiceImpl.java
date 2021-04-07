@@ -200,7 +200,11 @@ public class BandServiceImpl implements IBandService {
 	}
 	
 	private UserDTO getUser(String user) {
-		return Optional.ofNullable(userClient.findByEmail(getToken(), user)).orElseThrow(() -> new UserException("User not found", HttpStatus.BAD_REQUEST.value()));
+		String token = getToken();
+		System.out.println("O token is: " + token);
+		System.out.println("O user is: " + user);
+		
+		return Optional.ofNullable(userClient.findByEmail(token, user)).orElseThrow(() -> new UserException("User not found", HttpStatus.BAD_REQUEST.value()));
 	}
 	
 	private BandInfo bandInfo(UserDTO user, Band band) {
