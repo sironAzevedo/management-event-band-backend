@@ -193,8 +193,7 @@ public class BandServiceImpl implements IBandService {
 		}
 		
 		bands.forEach(ub -> {
-			BandDTO band = mapper.toDTO(ub.getCodigo().getBand());
-			result.add(band);
+			result.add(mapper.toDTO(ub.getCodigo().getBand()));
 		});
 		
 		return result;
