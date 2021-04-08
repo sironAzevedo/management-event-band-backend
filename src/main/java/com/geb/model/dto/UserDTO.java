@@ -37,5 +37,7 @@ public class UserDTO implements Serializable {
     private TypePersonEnum typeUser;
     private String chavePj;
     private AddressDTO address;
+    private String instruments;
+    private String voices;
     @Default private List<String> roles = new ArrayList<>();
 }

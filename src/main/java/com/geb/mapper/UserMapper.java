@@ -1,12 +1,16 @@
 package com.geb.mapper;
 
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.mapstruct.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import com.geb.model.Instrument;
 import com.geb.model.User;
+import com.geb.model.Voice;
 import com.geb.model.dto.UserDTO;
 import com.geb.model.enums.TypePersonEnum;
 
@@ -45,6 +49,8 @@ public abstract class UserMapper {
                 .confirmPassword(user.getConfirmPassword())
                 .typeUser(user.getTypeUser())
                 .chavePj(getChave(user))
+                .instruments(Objects.nonNull(user.getInstruments()) ? instruments(user.getInstruments()) : null)
+                .voices(Objects.nonNull(user.getVoices()) ? voices(user.getVoices()) : null)
                 .build();
     }
     
@@ -58,5 +64,13 @@ public abstract class UserMapper {
 		}
     	
     	return null;
+    }
+    
+    private String instruments(Set<Instrument> instruments) {
+    	return instruments.stream().map(Instrument::getName).collect(Collectors.joining(", "));
+    }
+    
+    private String voices(Set<Voice> voices) {
+    	return voices.stream().map(Voice::getName).collect(Collectors.joining(", "));
     }
 }

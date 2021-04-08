@@ -63,7 +63,7 @@ public class UserController {
 	}
 	
 	@ResponseBody
-	@GetMapping(value = "/instrument")
+	@PutMapping(value = "/instrument")
 	@ResponseStatus(value = HttpStatus.OK)
 	public void associateInstrument(
 			@RequestParam(value="user_code") Long code,
@@ -72,7 +72,7 @@ public class UserController {
 	}
 	
 	@ResponseBody
-	@GetMapping(value = "/voice")
+	@PutMapping(value = "/voice")
 	@ResponseStatus(value = HttpStatus.OK)
 	public void associateVoice(
 			@RequestParam(value="user_code") Long code,

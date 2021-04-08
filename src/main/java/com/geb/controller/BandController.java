@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,8 +38,8 @@ public class BandController {
 		return "{\"mensagem\": \"" + res + "\"}";
 	}
 	
-	@DeleteMapping
 	@ResponseBody
+	@DeleteMapping
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 	public void delete(@RequestParam(value="code") Long code) {
 		service.delete(code);
@@ -52,7 +53,7 @@ public class BandController {
 	}
 	
 	@ResponseBody
-	@GetMapping(value = "/associate-member")
+	@PutMapping(value = "/associate-member")
 	@ResponseStatus(value = HttpStatus.OK)
 	public void associateMembers(
 			@RequestParam(value="band_code") Long code,
