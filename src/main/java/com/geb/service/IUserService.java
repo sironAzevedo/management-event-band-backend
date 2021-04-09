@@ -23,4 +23,6 @@ public interface IUserService {
     void associateVoice(Long userCode, List<Long> voices);
     
     void disassociatePerfilUser(Long user, String role);
+    
+    List<UserDTO> findByUserLike(String value);
 }

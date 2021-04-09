@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.validation.constraints.Email;
 
@@ -37,7 +38,7 @@ public class UserDTO implements Serializable {
     private TypePersonEnum typeUser;
     private String chavePj;
     private AddressDTO address;
-    private String instruments;
-    private String voices;
+    private Set<InstrumentDTO> instruments;
+    private Set<VoiceDTO> voices;
     @Default private List<String> roles = new ArrayList<>();
 }

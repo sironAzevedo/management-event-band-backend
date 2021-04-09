@@ -11,7 +11,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import com.geb.model.Instrument;
 import com.geb.model.User;
 import com.geb.model.Voice;
+import com.geb.model.dto.InstrumentDTO;
 import com.geb.model.dto.UserDTO;
+import com.geb.model.dto.VoiceDTO;
 import com.geb.model.enums.TypePersonEnum;
 
 @Mapper(componentModel = "spring")
@@ -54,6 +56,17 @@ public abstract class UserMapper {
                 .build();
     }
     
+    public UserDTO toListMembers(User user) {
+    	return UserDTO
+                .builder()
+                .codigo(user.getCodigo())
+                .name(user.getName())
+                .email(user.getEmail())
+                .instruments(Objects.nonNull(user.getInstruments()) ? instruments(user.getInstruments()) : null)
+                .voices(Objects.nonNull(user.getVoices()) ? voices(user.getVoices()) : null)
+                .build();
+    }
+    
     private String getChave(User user) {
     	if(TypePersonEnum.PF.equals(user.getTypeUser())) {
     		if(Objects.nonNull(user.getAssociated())) {
@@ -66,11 +79,11 @@ public abstract class UserMapper {
     	return null;
     }
     
-    private String instruments(Set<Instrument> instruments) {
-    	return instruments.stream().map(Instrument::getName).collect(Collectors.joining(", "));
+    private Set<InstrumentDTO> instruments(Set<Instrument> instruments) {
+    	return instruments.stream().map(InstrumentMapper.INSTANCE::toDTO).collect(Collectors.toSet());
     }
     
-    private String voices(Set<Voice> voices) {
-    	return voices.stream().map(Voice::getName).collect(Collectors.joining(", "));
+    private Set<VoiceDTO> voices(Set<Voice> voices) {
+    	return voices.stream().map(VoiceMapper.INSTANCE::toDTO).collect(Collectors.toSet());
     }
 }

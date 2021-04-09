@@ -23,4 +23,6 @@ public interface IBandService {
     
     List<BandDTO> findAssociatedBandsByUser(String emailMember);
     
+    List<BandDTO> findBandsByName(String chave, String name);
+    
 }

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
@@ -210,6 +211,11 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 	public UserDTO findByChave(String chave) {
 		return repo.findByChaveChave(chave).map(mapper::toDTO)
 				.orElseThrow(()-> new UserException("key not found", HttpStatus.NOT_FOUND.value()));
+	}
+	
+	@Override
+	public List<UserDTO> findByUserLike(String value) {
+		return repo.findUsersByNameOrEmail(value).stream().map(mapper::toListMembers).collect(Collectors.toList());
 	}
 	
 	private PjChave addPjChave(User entity) {

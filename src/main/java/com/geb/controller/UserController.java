@@ -104,5 +104,14 @@ public class UserController {
 	public UserDTO findByKey(@RequestParam(value="chave") String chave) {
 		return service.findByChave(chave);
 	}
+	
+	@ResponseBody
+	@GetMapping(value = "/by-like")
+	@ResponseStatus(value = HttpStatus.OK)
+	public List<UserDTO> findByUserLike(
+			@RequestParam(value="like") String value
+			) {
+		return service.findByUserLike(value);
+	}
 
 }

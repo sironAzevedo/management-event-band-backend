@@ -88,4 +88,14 @@ public class BandController {
 			@RequestParam(value="band_code") Long code) {
 		return service.findMembers(code);
 	}
+	
+	@ResponseBody
+	@GetMapping(value = "/by-like")
+	@ResponseStatus(value = HttpStatus.OK)
+	public List<BandDTO> findBandsByName(
+			@RequestParam(value="chave") String chave,
+			@RequestParam(value="name") String name
+			) {
+		return service.findBandsByName(chave, name);
+	}
 }

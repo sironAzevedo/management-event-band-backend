@@ -189,6 +189,11 @@ public class BandServiceImpl implements IBandService {
 		}
 	}
 	
+	@Override
+	public List<BandDTO> findBandsByName(String chave, String name) {
+		return repository.findBandsByName(chave, name).stream().map(mapper::toDTO).collect(Collectors.toList());
+	}
+	
 	private UserDTO getUser(String user) {
 		return Optional.ofNullable(userClient.findByEmail(getToken(), user)).orElseThrow(() -> new UserException("User not found", HttpStatus.BAD_REQUEST.value()));
 	}
