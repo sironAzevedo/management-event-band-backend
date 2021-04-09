@@ -215,7 +215,11 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 	
 	@Override
 	public List<UserDTO> findByUserLike(String value) {
-		return repo.findUsersByNameOrEmail(value).stream().map(mapper::toListMembers).collect(Collectors.toList());
+		return repo.findUsersByNameOrEmail(value)
+				.stream()
+				.filter(r -> !r.getInstruments().isEmpty() || !r.getVoices().isEmpty())
+				.map(mapper::toListMembers)
+				.collect(Collectors.toList());
 	}
 	
 	private PjChave addPjChave(User entity) {
