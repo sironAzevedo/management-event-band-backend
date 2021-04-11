@@ -93,9 +93,9 @@ public class BandController {
 	@GetMapping(value = "/by-like")
 	@ResponseStatus(value = HttpStatus.OK)
 	public List<BandDTO> findBandsByName(
-			@RequestParam(value="chave") String chave,
+			@RequestParam(value="email") String email,
 			@RequestParam(value="name") String name
 			) {
-		return service.findBandsByName(chave, name);
+		return service.findBandsByName(email, name);
 	}
 }

@@ -25,10 +25,16 @@ public interface IBandPerository extends JpaRepository<Band, Long> {
 	List<Band> findByUserPF(String email);
 	
 	@Query(value = "select * from {h-schema}tb_band tb "
-		+ "inner join {h-schema}tb_pj_associated_band tpab "
+		+ "left join {h-schema}tb_pj_associated_band tpab "
 		+ "on tpab.id_band = tb.id "
-		+ "where tpab.chave = :chave "
+		+ "left join {h-schema}tb_pj_chave tpc "
+		+ "on tpc.chave = tpab.chave "
+		+ "left join {h-schema}tb_band_info tbi "
+		+ "on tbi.id_band = tb.id "
+		+ "left join {h-schema}tb_user tu "
+		+ "on (tu.id = tbi.id_user or tu.id = tpc.id_user ) "
+		+ "where tu.email = :email "
 		+ "and lower(tb.name) like lower(concat('%', concat(:name, '%'))) "
 		,nativeQuery = true)
-	List<Band> findBandsByName(@Param("chave") String chave, @Param("name") String name);
+	List<Band> findBandsByName(@Param("email") String email, @Param("name") String name);
 }

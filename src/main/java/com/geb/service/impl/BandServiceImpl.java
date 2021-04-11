@@ -190,8 +190,11 @@ public class BandServiceImpl implements IBandService {
 	}
 	
 	@Override
-	public List<BandDTO> findBandsByName(String chave, String name) {
-		return repository.findBandsByName(chave, name).stream().map(mapper::toDTO).collect(Collectors.toList());
+	public List<BandDTO> findBandsByName(String email, String name) {
+		UserDTO user = this.getUser(email);
+		AuthService.authenticated(user.getEmail());
+		
+		return repository.findBandsByName(user.getEmail(), name).stream().map(mapper::toDTO).collect(Collectors.toList());
 	}
 	
 	private UserDTO getUser(String user) {
