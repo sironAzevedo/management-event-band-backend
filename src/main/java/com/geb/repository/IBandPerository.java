@@ -24,7 +24,13 @@ public interface IBandPerository extends JpaRepository<Band, Long> {
 			, nativeQuery = true)
 	List<Band> findByUserPF(String email);
 	
-	@Query(value = "select * from {h-schema}tb_band tb "
+	@Query(value = "select "
+		+ "tb.id, "	
+		+ "tb.name, "
+		+ "tpab.chave, "
+		+ "tb.created_at, "
+		+ "tb.updated_at "
+		+ "from {h-schema}tb_band tb "		
 		+ "left join {h-schema}tb_pj_associated_band tpab "
 		+ "on tpab.id_band = tb.id "
 		+ "left join {h-schema}tb_pj_chave tpc "
@@ -35,6 +41,7 @@ public interface IBandPerository extends JpaRepository<Band, Long> {
 		+ "on (tu.id = tbi.id_user or tu.id = tpc.id_user ) "
 		+ "where tu.email = :email "
 		+ "and lower(tb.name) like lower(concat('%', concat(:name, '%'))) "
+		+ "group by tb.id, tpab.chave "
 		,nativeQuery = true)
 	List<Band> findBandsByName(@Param("email") String email, @Param("name") String name);
 }

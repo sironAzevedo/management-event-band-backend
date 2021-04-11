@@ -48,7 +48,7 @@ public class Band implements Serializable {
     private String name;
     
     @CreationTimestamp
-    @Column(name = "CREATED_AT", nullable = false, updatable = false)
+    @Column(name = "CREATED_AT", updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
