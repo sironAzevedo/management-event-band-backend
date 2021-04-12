@@ -82,6 +82,7 @@ client:
   user_url: ${USER_URL:http://localhost:8080/geb}
   instrument_url: ${INSTRUMENT_URL:http://localhost:8080/geb}
   voice_url: ${VOICE_URL:http://localhost:8080/geb}
+  band_url: ${BAND_URL:http://localhost:8080/geb}
   
 feign:
     hystrix:
