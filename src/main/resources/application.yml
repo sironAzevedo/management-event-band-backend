@@ -59,7 +59,7 @@ mail:
     auth: true
     debug: true
     from: ${EMAIL_USER}
-    host: smtp.googlemail.com
+    host: smtp.gmail.com
     port: 465
     socketFactory:
       class: javax.net.ssl.SSLSocketFactory
