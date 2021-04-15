@@ -18,6 +18,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import com.geb.handler.exception.AuthorizationException;
 import com.geb.handler.exception.BandException;
+import com.geb.handler.exception.EmailException;
 import com.geb.handler.exception.EmptyResultDataAccessException;
 import com.geb.handler.exception.InternalErrorException;
 import com.geb.handler.exception.NotFoundException;
@@ -77,6 +78,13 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 	@ResponseStatus(value = HttpStatus.FORBIDDEN)
 	public StandardError authorizationException(AccessDeniedException e, HttpServletRequest request) {		
 		return StandardError.builder(HttpStatus.FORBIDDEN.value(), e.getMessage(), new Date());
+	}
+	
+	@ResponseBody
+	@ExceptionHandler(EmailException.class)
+	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
+	public StandardError emailException(EmailException e, HttpServletRequest request) {
+		return StandardError.builder(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(), new Date());
 	}
 
 	@Override

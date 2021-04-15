@@ -25,4 +25,6 @@ public interface IUserService {
     void disassociatePerfilUser(Long user, String role);
     
     List<UserDTO> findByUserLike(String value);
+
+	void sendNewPassword(String email);
 }

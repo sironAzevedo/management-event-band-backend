@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.geb.model.dto.EmailDTO;
 import com.geb.model.dto.UserDTO;
 import com.geb.service.IUserService;
 
@@ -112,6 +113,13 @@ public class UserController {
 			@RequestParam(value="like") String value
 			) {
 		return service.findByUserLike(value);
+	}
+	
+	@ResponseBody
+	@PostMapping(value = "/forgot")
+	@ResponseStatus(value = HttpStatus.OK)
+	public void novaSenha(@Valid @RequestBody EmailDTO dto) {
+		service.sendNewPassword(dto.getEmail());
 	}
 
 }

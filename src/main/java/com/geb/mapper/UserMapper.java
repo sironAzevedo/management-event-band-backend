@@ -27,6 +27,7 @@ public abstract class UserMapper {
         String password = pe.encode(dto.getPassword());
         return User
                 .builder()
+                .codigo(dto.getCodigo())
                 .name(dto.getName())
                 .email(dto.getEmail())
                 .socialReason(dto.getSocialReason())

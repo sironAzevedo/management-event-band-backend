@@ -29,6 +29,7 @@ import com.geb.mapper.AddressMapper;
 import com.geb.mapper.UserMapper;
 import com.geb.model.Address;
 import com.geb.model.Instrument;
+import com.geb.model.MensagemDTO;
 import com.geb.model.PjAssociatedUser;
 import com.geb.model.PjChave;
 import com.geb.model.Role;
@@ -40,6 +41,7 @@ import com.geb.model.dto.VoiceDTO;
 import com.geb.model.enums.PerfilEnum;
 import com.geb.repository.IRoleRepository;
 import com.geb.repository.IUserPerository;
+import com.geb.service.IEmailService;
 import com.geb.service.IUserService;
 import com.geb.util.Util;
 
@@ -64,6 +66,9 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
     
     @Autowired
 	private HttpServletRequest request;
+    
+    @Autowired
+	private IEmailService emailService;
 
     @Override
     public void create(UserDTO user) {
@@ -222,6 +227,18 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 				.collect(Collectors.toList());
 	}
 	
+	@Override
+	public void sendNewPassword(String email) {
+		UserDTO dto = this.findByEmail(email);
+		
+		String newPass = Util.newPassword();
+		dto.setPassword(newPass);
+		
+		User user = mapper.toEntity(dto);
+		repo.updatePassword(user.getPassword(), user.getConfirmPassword(), user.getCodigo());
+		emailService.sendEmail(message(dto.getEmail(), newPass));
+	}
+	
 	private PjChave addPjChave(User entity) {
 		try {
 			return PjChave
@@ -248,5 +265,17 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 			}
 		}
 		return res;
+	}
+
+	
+	private MensagemDTO message(String email, String newPass) {
+		return MensagemDTO
+				.builder()
+				.destinatario(email)
+				.assunto("Solicitação de nova senha")
+				.texto("Nova senha: " + newPass)
+				.html(Boolean.FALSE)
+				.anexo(Boolean.FALSE)
+				.build();
 	}
 }

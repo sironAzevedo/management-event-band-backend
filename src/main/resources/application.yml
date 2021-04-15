@@ -52,27 +52,27 @@ spring:
 #  profile:
 #    size: 200
 #
-#mail:
-#  username: ${EMAIL_USER}
-#  password: ${EMAIL_PASS}
-#  smtp:
-#    auth: true
-#    debug: true
-#    from: ${EMAIL_USER}
-#    host: smtp.googlemail.com
-#    port: 465
-#    socketFactory:
-#      class: javax.net.ssl.SSLSocketFactory
-#      fallback: false
-#      port: 465
-#    ssl:
-#      enable: true
-#    starttls:
-#      enable: true
-#      required: true
-#  test-connection: true
-#  transport:
-#    protocol: smtp
+mail:
+  username: ${EMAIL_USER}
+  password: ${EMAIL_PASS}
+  smtp:
+    auth: true
+    debug: true
+    from: ${EMAIL_USER}
+    host: smtp.googlemail.com
+    port: 465
+    socketFactory:
+      class: javax.net.ssl.SSLSocketFactory
+      fallback: false
+      port: 465
+    ssl:
+      enable: true
+    starttls:
+      enable: true
+      required: true
+  test-connection: true
+  transport:
+    protocol: smtp
 
 jwt:
   secret: ${JWT_SECRET:SequenciaDeCaracteresParaAssinarToken}
