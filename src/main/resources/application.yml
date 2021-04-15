@@ -60,11 +60,11 @@ mail:
     debug: true
     from: ${EMAIL_USER}
     host: smtp.gmail.com
-    port: 465
+    port: 587
     socketFactory:
       class: javax.net.ssl.SSLSocketFactory
       fallback: false
-      port: 465
+      port: 587
     ssl:
       enable: true
     starttls:
