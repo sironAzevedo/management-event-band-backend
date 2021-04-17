@@ -1,5 +1,6 @@
 package com.geb.service.impl;
 
+import java.awt.image.BufferedImage;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
@@ -14,10 +15,12 @@ import javax.transaction.Transactional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.geb.client.InstrumentClient;
 import com.geb.client.VoiceClient;
@@ -41,6 +44,7 @@ import com.geb.model.dto.VoiceDTO;
 import com.geb.model.enums.PerfilEnum;
 import com.geb.repository.IRoleRepository;
 import com.geb.repository.IUserPerository;
+import com.geb.service.IAwsService;
 import com.geb.service.IEmailService;
 import com.geb.service.IUserService;
 import com.geb.util.Util;
@@ -70,6 +74,15 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
     @Autowired
 	private IEmailService emailService;
 
+    @Autowired
+    private IAwsService awsService;
+    
+    @Value("${img.prefix.client.profile}")
+	private String prefix;
+
+	@Value("${img.profile.size}")
+	private Integer size;
+    
     @Override
     public void create(UserDTO user) {
     	
@@ -239,6 +252,18 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 		emailService.sendEmail(message(dto.getEmail(), newPass));
 	}
 	
+	@Override
+	public void photoProfile(MultipartFile file) {
+		final String EXT = "jpg";
+		BufferedImage image = Util.getJpgImageFromFile(file);
+		image = Util.resize(Util.cropSquare(image), size);
+		User user = AuthService.authenticated();
+		String fileName = prefix + user.getCodigo() + "." + EXT;
+		
+		awsService.uploadFile(Util.getInputStream(image, EXT), fileName, "image", "photo-profile");
+		
+	}
+	
 	private PjChave addPjChave(User entity) {
 		try {
 			return PjChave
@@ -266,7 +291,6 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 		}
 		return res;
 	}
-
 	
 	private MensagemDTO message(String email, String newPass) {
 		return MensagemDTO
@@ -278,4 +302,6 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 				.anexo(Boolean.FALSE)
 				.build();
 	}
+
+	
 }

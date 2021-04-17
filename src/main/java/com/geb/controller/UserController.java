@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.geb.model.dto.EmailDTO;
 import com.geb.model.dto.UserDTO;
@@ -120,6 +121,13 @@ public class UserController {
 	@ResponseStatus(value = HttpStatus.OK)
 	public void novaSenha(@Valid @RequestBody EmailDTO dto) {
 		service.sendNewPassword(dto.getEmail());
+	}
+	
+	@ResponseBody
+	@ResponseStatus(value = HttpStatus.CREATED)
+	@PostMapping(value = "/picture")
+	public void photoProfile(@RequestParam(name="file") MultipartFile file) {
+		service.photoProfile(file);
 	}
 
 }

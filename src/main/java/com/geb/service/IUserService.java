@@ -2,6 +2,8 @@ package com.geb.service;
 
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.geb.model.dto.UserDTO;
 
 public interface IUserService {
@@ -27,4 +29,6 @@ public interface IUserService {
     List<UserDTO> findByUserLike(String value);
 
 	void sendNewPassword(String email);
+
+	void photoProfile(MultipartFile file);
 }

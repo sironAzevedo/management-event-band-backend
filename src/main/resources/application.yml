@@ -38,19 +38,19 @@ spring:
     locations:
       - classpath:db/migration
 
-#aws:
-#  access_key_id: ${S3_KEY}
-#  secret_access_key: ${S3_SECRET}
-#  s3:
-#    bucket: caderneta-conta
-#    region: sa-east-1
-#
-#img:
-#  prefix:
-#    client:
-#      profile: cp
-#  profile:
-#    size: 200
+aws:
+  access_key_id: ${ACCESS_KEY}
+  secret_access_key: ${ACCESS_SECRET}
+  s3:
+    bucket: ${BUCKET_NAME}
+    region: us-east-1
+
+img:
+  prefix:
+    client:
+      profile: ph
+  profile:
+    size: 200
 #
 mail:
   username: ${EMAIL_USER}
